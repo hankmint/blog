@@ -1,2 +1,9 @@
 {
+  "params": {
+    "dateFormatToUse": "January 02, 2006",
+    "logoTitle": "<span class=\"mark\">MINT</span><span class=\"by\">by Nana Kofi</span>",
+    "description": "Writing on tech, business, and the creative.",
+    "archive-paginate": 100,
+    "featuredCount": 2
+  }
 }

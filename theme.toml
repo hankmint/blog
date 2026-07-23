@@ -1,20 +1,20 @@
-# theme.toml template for a Hugo theme
-# See https://github.com/gohugoio/hugoThemes#themetoml for an example
+# theme.toml for the MINT theme
+# Based on Arabica (a Hugo port of the Ghost Arabica theme). MIT licensed.
 
-name = "Arabica"
+name = "MINT"
 license = "MIT"
-licenselink = "https://github.com/nirocfz/arabica/blob/master/LICENSE"
-description = "A port of the Ghost arabica theme for Hugo"
-homepage = "https://github.com/nirocfz/arabica"
-tags = ["blog", "minimal"]
-features = ["smooth", "minimal"]
+licenselink = "https://github.com/hankmint/blog/blob/main/LICENSE"
+description = "Editorial long-form theme for MINT by Nana Kofi. Based on Arabica."
+homepage = "https://nanakofiwrites.com/"
+tags = ["blog", "editorial", "minimal", "microblog"]
+features = ["editorial", "dark-mode", "gallery"]
 min_version = "0.41"
 
 [author]
-  name = "Chen Fangzhou"
-  homepage = "https://fixatom.com"
+  name = "Nana Kofi"
+  homepage = "https://nanakofiwrites.com/"
 
-# If porting an existing theme
+# Ported from the Arabica theme
 [original]
   name = "Arabica"
   homepage = "https://thedarkroast.com/"
