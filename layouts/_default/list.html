@@ -1,23 +1,31 @@
-{{ define "body_class" }}tag-template{{ end }}
-{{ define "title" }}{{ .Title }}{{ end }}
+{{ define "body_class" }}list-template{{ end }}
+{{ define "title" }}{{ .Site.Title }} - {{ .Title }}{{ end }}
 {{ define "main" }}
-{{ $paginator := .Paginate (where .Pages.ByDate.Reverse "Type" "post") (index .Site.Params "archive-paginate" | default 25) }}
-<main class="content" role="main">
-  {{ if not $paginator.HasPrev }}
-    {{ if eq .Data.Plural "tags" }}
-      <h2 class="tag-title">{{ .Title }}</h2>
-    {{ end }}
-  {{ end }}
+<main class="content mint-home" role="main">
+  <h1 class="mint-list-title">{{ .Title }}</h1>
+  {{ $posts := (where .Pages "Type" "post").ByDate.Reverse }}
+  {{ if not $posts }}{{ $posts = .Pages.ByDate.Reverse }}{{ end }}
+  {{ $posts = where $posts "Title" "!=" "" }}
+  <p class="mint-list-sub">{{ len $posts }} {{ cond (eq (len $posts) 1) "essay" "essays" }}</p>
+  {{ with .Content }}<div class="microblog_category_intro">{{ . }}</div>{{ end }}
 
-	<div class="extra-pagination">
-	    {{ partial "pagination.html" .}}
-	</div>
-  {{ with .Content }}
-    <div class="microblog_category_intro">{{ . }}</div>
-  {{ end }}
-  {{ range $paginator.Pages  }}
-  {{ .Render "summary"  }}
-  {{ end  }}
-  {{ partial "pagination.html" .  }}
+  <div class="mint-index">
+    {{ $year := "" }}
+    {{ range $posts }}
+      {{ $y := .Date.Format "2006" }}
+      {{ if ne $y $year }}
+        {{ if ne $year "" }}</ul>{{ end }}
+        <div class="mint-year">{{ $y }}</div>
+        <ul class="mint-entries">
+        {{ $year = $y }}
+      {{ end }}
+      <li><a class="mint-entry h-entry" href="{{ .Permalink }}">
+        <span class="date">{{ .Date.Format "Jan 02" }}</span>
+        <span class="ttl p-name">{{ .Title }}</span>
+        <span class="topic">{{ with .Params.categories }}<span class="dot"></span>{{ index . 0 }}{{ end }}</span>
+      </a></li>
+    {{ end }}
+    {{ if ne $year "" }}</ul>{{ end }}
+  </div>
 </main>
 {{ end }}

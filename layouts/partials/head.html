@@ -12,24 +12,29 @@
     <meta name="HandheldFriendly" content="True" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Styles and Fonts -->
+    <!-- Set theme before paint to avoid a flash -->
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem('mint-theme');
+          if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t);
+        } catch (e) {}
+      })();
+    </script>
+
+    <!-- Styles and fonts (all local, no external requests) -->
     <link rel="stylesheet" type="text/css" href="{{ "assets/css/normalize.css" | relURL }}" />
-    <link rel="stylesheet" type="text/css" href="{{ "assets/css/icons.css" | relURL }}" />
-    <link rel="stylesheet" type="text/css" href="{{ "assets/css/screen.css" | relURL }}" />
+    <link rel="stylesheet" type="text/css" href="{{ "css/fonts.css" | relURL }}" />
+    <link rel="stylesheet" type="text/css" href="{{ "css/mint.css" | relURL }}" />
 
-    {{ if .Site.Params.replaceGoogleFonts }}
-    <link href="https://{{ .Site.Params.replaceGoogleFonts }}/css?family=Bree+Serif|Lato:100,100i,300,300i,400,400i,700,700i|Source+Code+Pro:300,400,500,700" rel="stylesheet">
-    {{ else }}
-    <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Lato:100,100i,300,300i,400,400i,700,700i|Source+Code+Pro:300,400,500,700" rel="stylesheet">
-    {{ end }}
-
-    <!-- Bigfoot - popover footnotes -->
-    <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+    <!-- Bigfoot popover footnotes (jQuery vendored locally, no CDN) -->
+    <script src="{{ "assets/jquery.min.js" | relURL }}"></script>
     <script type="text/javascript" src="{{ "assets/bigfoot/dist/bigfoot.js" | relURL }}"></script>
     <link rel="stylesheet" type="text/css" href="{{ "assets/bigfoot/dist/bigfoot-number.css" | relURL }}" />
     <script type="text/javascript">
-        $.bigfoot();
+        $(function () { if ($.bigfoot) { $.bigfoot(); } });
     </script>
+
     <!-- custom css -->
     {{ range .Site.Params.customCSS }}
     <link rel="stylesheet" href="{{ "/css/" | relURL }}{{ . }}">

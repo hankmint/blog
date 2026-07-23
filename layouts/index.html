@@ -1,12 +1,48 @@
 {{ define "main" }}
-	<main class="content h-feed" role="main">
-    {{ $paginator := .Paginate (where .Site.Pages "Type" "post") }}
-    <div class="extra-pagination">
-      {{ partial "pagination.html" . }}
+<main class="content h-feed mint-home" role="main">
+  {{ $posts := where (where .Site.RegularPages "Type" "post") "Title" "!=" "" }}
+  {{ $posts = $posts.ByDate.Reverse }}
+  {{ $n := int (.Site.Params.featuredCount | default 2) }}
+
+  <section class="mint-lede">
+    <div class="mint-eyebrow">{{ .Site.Params.description | default "Latest" | safeHTML }}</div>
+    <div class="mint-featured">
+      {{ range first $n $posts }}
+        <article class="feat h-entry">
+          <h2 class="p-name"><a class="u-url" href="{{ .Permalink }}">{{ .Title }}</a></h2>
+          {{ with .Summary }}<p class="stand p-summary">{{ . | plainify | truncate 190 }}</p>{{ end }}
+          <div class="post-meta">
+            {{ with .Params.categories }}<span class="dot"></span><span>{{ index . 0 }}</span><span>&middot;</span>{{ end }}
+            <time class="dt-published" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format (.Site.Params.dateFormatToUse | default "January 02, 2006") }}</time>
+            <span>&middot;</span><span>{{ .ReadingTime }} min</span>
+          </div>
+        </article>
+      {{ end }}
     </div>
-		{{ range $paginator.Pages }}
-      {{ .Render "summary" }}
-		{{ end }}
-    {{ partial "pagination.html" . }}
-	</main>
+  </section>
+
+  <section class="mint-index">
+    <div class="mint-index-head">
+      <h2>The Index</h2>
+      <span class="count">{{ len $posts }} {{ cond (eq (len $posts) 1) "essay" "essays" }}</span>
+    </div>
+    {{ $rest := after $n $posts }}
+    {{ $year := "" }}
+    {{ range $rest }}
+      {{ $y := .Date.Format "2006" }}
+      {{ if ne $y $year }}
+        {{ if ne $year "" }}</ul>{{ end }}
+        <div class="mint-year">{{ $y }}</div>
+        <ul class="mint-entries">
+        {{ $year = $y }}
+      {{ end }}
+      <li><a class="mint-entry h-entry" href="{{ .Permalink }}">
+        <span class="date">{{ .Date.Format "Jan 02" }}</span>
+        <span class="ttl p-name">{{ .Title }}</span>
+        <span class="topic">{{ with .Params.categories }}<span class="dot"></span>{{ index . 0 }}{{ end }}</span>
+      </a></li>
+    {{ end }}
+    {{ if ne $year "" }}</ul>{{ end }}
+  </section>
+</main>
 {{ end }}

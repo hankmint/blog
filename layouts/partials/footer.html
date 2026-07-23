@@ -1,9 +1,9 @@
 <footer class="site-footer">
-  <section class="rss"><a class="subscribe-button icon-feed" href="/feed.xml"></a></section>
-  {{ with .Site.Params.twitter }}<section class="twitter"><a class="icon-twitter" href="https://twitter.com/{{ . }}"> {{ . }}</a></section>{{ end }}
-  {{ with .Site.Params.facebook }}<section class="facebook"><a class="icon-facebook" href="https://www.facebook.com/{{ . }}"> {{ . }}</a></section>{{ end }}
+  <section class="brand-line">{{ .Site.Title }} by Nana Kofi &middot; nanakofiwrites.com</section>
+  <section class="rss"><a href="/feed.xml">RSS</a></section>
+  {{ with .Site.Params.mastodon }}<section class="mastodon"><a href="{{ . }}" rel="me">Mastodon</a></section>{{ end }}
   <section class="copyright">&copy; {{ now.Format "2006" }} {{ .Site.Title }}</section>
-  <section class="poweredby"><a href="http://thedarkroast.com/arabica">Arabica</a> theme by Sean Lunsford. Published with <a href="https://gohugo.io">Hugo</a> and <a href="https://micro.blog/">Micro.blog</a>.</section>
+  <section class="poweredby">Theme based on <a href="https://github.com/slunsford/arabica">Arabica</a> by Sean Lunsford. Published with <a href="https://gohugo.io">Hugo</a> and <a href="https://micro.blog/">Micro.blog</a>.</section>
 </footer>
 <!-- custom js -->
 {{ range .Site.Params.customJS }}

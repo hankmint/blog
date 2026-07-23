@@ -1,0 +1,45 @@
+{{ define "body_class" }}gallery-template{{ end }}
+{{ define "title" }}{{ .Site.Title }} - {{ .Title }}{{ end }}
+{{ define "main" }}
+<main class="content mint-wide" role="main">
+  <div class="mint-gal-head">
+    <h1>{{ .Title | default "The Gallery" }}</h1>
+    {{ with .Content }}{{ . }}{{ else }}<p>Mornings before the city wakes. Photographs, made mostly at first light.</p>{{ end }}
+  </div>
+
+  {{/* Collect images from every post. A photo appears here as soon as it is posted. */}}
+  {{ $shots := slice }}
+  {{ $source := where .Site.RegularPages "Type" "post" }}
+  {{ with .Site.GetPage "/categories/photos" }}{{ $source = .Pages }}{{ end }}
+  {{ range $source.ByDate.Reverse }}
+    {{ $cap := .Title | default (.Date.Format "January 2006") }}
+    {{ $url := .Permalink }}
+    {{ with .Params.images }}
+      {{ range . }}
+        {{ $shots = $shots | append (dict "src" . "cap" $cap "url" $url) }}
+      {{ end }}
+    {{ else }}
+      {{ with .Params.image }}
+        {{ $shots = $shots | append (dict "src" . "cap" $cap "url" $url) }}
+      {{ end }}
+    {{ end }}
+    {{ range $m := findRE `<img[^>]+src="[^"]+"` .Content }}
+      {{ $src := replaceRE `.*src="([^"]+)".*` "$1" $m }}
+      {{ $shots = $shots | append (dict "src" $src "cap" $cap "url" $url) }}
+    {{ end }}
+  {{ end }}
+
+  {{ if $shots }}
+  <div class="mint-gallery">
+    {{ range $shots }}
+      <a class="mint-shot" href="{{ .url }}" data-full="{{ .src }}" data-cap="{{ .cap }}">
+        <img src="{{ .src }}" alt="{{ .cap }}" loading="lazy" />
+        <span class="cap">{{ .cap }}</span>
+      </a>
+    {{ end }}
+  </div>
+  {{ else }}
+  <p class="mint-gallery-empty">No photos yet. Post a photo story from Sunlit and it will appear here.</p>
+  {{ end }}
+</main>
+{{ end }}

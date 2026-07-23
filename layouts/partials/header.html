@@ -1,25 +1,28 @@
 <header class="main-header">
-	<div class="h-card main-header-content">
-		<h1 class=" blog-title">
+	<div class="masthead-inner">
+		<h1 class="h-card blog-title">
 			<a class="u-url p-name" href="{{ "/" | relLangURL }}">
 				{{ if .Site.Params.logoTitle }}
 					{{ .Site.Params.logoTitle | safeHTML }}
 				{{ else }}
-           			{{ .Site.Title }}
+					{{ .Site.Title }}
 				{{ end }}
 			</a>
 		</h1>
 		<h2 class="p-note blog-description">{{ .Site.Params.description | safeHTML }}</h2>
-	</div>
 
-	<div class="nav">
-    {{ $currentPage := . }}
-		{{ range .Site.Menus.main }}
-			{{ if .Page.Params.redirect_url }}
-				<a class="nav-" href="{{ .Page.Params.redirect_url }}">{{ .Name }}</a>
-			{{ else }}
-				<a class="nav- {{ if eq $currentPage.RelPermalink .URL }}nav-current{{ end }}" role="presentation" href="{{ .URL | relLangURL | safeURL }}">{{ .Name }}</a>
+		<nav class="nav" role="navigation">
+		{{ $currentPage := . }}
+			{{ range .Site.Menus.main }}
+				{{ $redirect := "" }}
+				{{ with .Page }}{{ $redirect = .Params.redirect_url }}{{ end }}
+				{{ if $redirect }}
+					<a href="{{ $redirect }}">{{ .Name }}</a>
+				{{ else }}
+					<a {{ if or (eq $currentPage.RelPermalink .URL) (and (ne .URL "/") (hasPrefix $currentPage.RelPermalink .URL)) }}class="nav-current"{{ end }} href="{{ .URL | relLangURL | safeURL }}">{{ .Name }}</a>
+				{{ end }}
 			{{ end }}
-		{{ end }}
+			<button type="button" class="mint-theme-toggle" id="mint-theme-toggle" aria-label="Toggle dark mode">Dark</button>
+		</nav>
 	</div>
 </header>
