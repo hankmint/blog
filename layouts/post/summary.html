@@ -1,0 +1,17 @@
+<article class="h-entry post">
+	<header class="post-header">
+    {{ with .Params.image }}
+      <img class="u-featured" src="{{ . }}"></img>
+    {{ end }}
+		{{ if .Title }}<h2 class="p-name post-title"><a href="{{ .Permalink }}">{{ .Title }}</a></h2>{{ end }}
+	</header>
+	<section class="e-content post-excerpt">
+    <p>
+      {{ .Content }}
+    </p>
+	</section>
+	<footer class="post-meta">
+		<a class="u-author h-card" href="/"></a>
+	<a class="read-more u-url" href="{{ .Permalink }}"><time class="post-date dt-published" datetime="{{ .Date.Format "2006-01-02 15:04:05 -0700" }}">{{ .Date.Format (.Site.Params.dateFormatToUse | default "January 02, 2006")  }}</time></a>
+	</footer>
+</article>

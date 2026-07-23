@@ -1,0 +1,25 @@
+<header class="main-header">
+	<div class="h-card main-header-content">
+		<h1 class=" blog-title">
+			<a class="u-url p-name" href="{{ "/" | relLangURL }}">
+				{{ if .Site.Params.logoTitle }}
+					{{ .Site.Params.logoTitle | safeHTML }}
+				{{ else }}
+           			{{ .Site.Title }}
+				{{ end }}
+			</a>
+		</h1>
+		<h2 class="p-note blog-description">{{ .Site.Params.description | safeHTML }}</h2>
+	</div>
+
+	<div class="nav">
+    {{ $currentPage := . }}
+		{{ range .Site.Menus.main }}
+			{{ if .Page.Params.redirect_url }}
+				<a class="nav-" href="{{ .Page.Params.redirect_url }}">{{ .Name }}</a>
+			{{ else }}
+				<a class="nav- {{ if eq $currentPage.RelPermalink .URL }}nav-current{{ end }}" role="presentation" href="{{ .URL | relLangURL | safeURL }}">{{ .Name }}</a>
+			{{ end }}
+		{{ end }}
+	</div>
+</header>

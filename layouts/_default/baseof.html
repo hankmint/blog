@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+    {{ partial "head.html" . }}
+    <body class="{{ block "body_class" . }}{{end}}">
+        {{ partial "header.html" . }}
+        {{ block "main" . }}{{ end }}
+        {{ partial "footer.html" . }}
+        {{ partial "custom_footer.html" . }}
+        {{ range .Site.Params.plugins_js }}
+            <script src="{{ . }}"></script>
+        {{ end }}
+    </body>
+</html>

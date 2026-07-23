@@ -1,0 +1,38 @@
+{{ define "body_class" }}post-template{{ end }}
+{{ define "main" }}
+<main class="content" role="main">
+  <article class="post h-entry">
+    <header class="post-header">
+      {{ with .Params.image }}
+        <img src="{{ . }}"></img>
+      {{ end }}
+      {{ if .Title }}<h2 class="post-title p-name">{{ .Title }}</h2>{{ end }}
+      <section class="post-meta">
+        <a class="read-more u-url" href="{{ .Permalink }}"><time class="post-date dt-published" datetime="{{ .Date.Format "2006-01-02 15:04:05 -0700" }}">{{ .Date.Format (.Site.Params.dateFormatToUse | default "January 02, 2006") }}</time></a>
+        <a class="u-author h-card" href="/"></a>
+      </section>
+    </header>
+    <section class="post-content e-content">
+      {{ .Content }}
+    </section>
+    <footer class="post-footer">
+      {{ with .Params.tags -}}
+      <section class="tags post-meta">
+        Tagged
+        {{ range . }}
+        {{- $name := . -}}
+          {{- with $.Site.GetPage "taxonomy" (printf "tags/%s" $name) | default ($.Site.GetPage "taxonomy" (printf "tags/%s" ($name | urlize))) -}}
+          <a href="{{ .Permalink }}">{{ $name }}</a>
+          {{ end -}}
+        {{ end }}
+      </section>
+      {{- end }}
+    </footer>
+  </article>
+
+{{ if .Site.Params.include_conversation }}
+<script type="text/javascript" src="https://micro.blog/conversation.js?url={{ .Permalink }}"></script>
+{{ end }}
+
+</main>
+{{ end }}
