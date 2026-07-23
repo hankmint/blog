@@ -9,8 +9,8 @@
 ## 1. Goal
 
 Turn the current minimal photo/reflection microblog into a durable, long-form
-**founder's personal blog** with rich images, spanning **Tech, Business, and
-Creative**, without adding posting friction. The design must "live on" and be
+**founder's personal blog** with rich images, spanning **Building, Creative, and
+Life**, without adding posting friction. The design must "live on" and be
 easy to feed regularly.
 
 ## 2. Platform decision (settled)
@@ -34,7 +34,7 @@ maintenance burden that works against "post regularly" and "lives on."
 
 ## 3. Identity & voice
 
-- Founder's personal blog. One voice, three currents: **Tech · Business · Creative**.
+- Founder's personal blog. One voice, three absorbing rooms: **Building** (tech, business, product), **Creative** (writing, design, art, projects, reading), **Life** (community, pets, place, the personal). The homepage index carries every post regardless of room; the rooms are optional nav lenses, not required boxes.
 - **Masthead:** "MINT by Nana Kofi" (brand + byline).
 
 ## 4. Aesthetic direction
@@ -69,9 +69,11 @@ the rest of the color.
 
 ## 6. Navigation & topics
 
-- Top nav: `Tech · Business · Creative · Gallery · About`.
-- **Tech / Business / Creative** are Micro.blog **categories**, each with its own
-  filtered archive page and its own RSS feed.
+- Top nav: `Building · Creative · Life · Gallery · About`.
+- **Building / Creative / Life** are Micro.blog **categories**, each with its own
+  filtered archive page and its own RSS feed. They are set and named on the
+  Micro.blog side (not hardcoded in the theme), so they can be renamed or added
+  to later without code changes.
 - **Gallery** and **About** are dedicated pages (see below).
 
 ## 7. Long-form reading experience (post page)
