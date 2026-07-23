@@ -1,14 +1,12 @@
 <article class="h-entry post">
 	<header class="post-header">
     {{ with .Params.image }}
-      <img class="u-featured" src="{{ . }}"></img>
+      <img class="u-featured" src="{{ . }}" alt="{{ $.Title | default "Photo by Nana Kofi" }}" />
     {{ end }}
 		{{ if .Title }}<h2 class="p-name post-title"><a href="{{ .Permalink }}">{{ .Title }}</a></h2>{{ end }}
 	</header>
 	<section class="e-content post-excerpt">
-    <p>
       {{ .Content }}
-    </p>
 	</section>
 	<footer class="post-meta">
 		<a class="u-author h-card" href="/"></a>

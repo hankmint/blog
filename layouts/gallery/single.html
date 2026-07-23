@@ -7,25 +7,28 @@
     {{ with .Content }}{{ . }}{{ else }}<p>Mornings before the city wakes. Photographs, made mostly at first light.</p>{{ end }}
   </div>
 
-  {{/* Collect images from every post. A photo appears here as soon as it is posted. */}}
+  {{/* Collect images from every post. A photo appears here as soon as it is posted.
+       Prefer front-matter images; only scan the body when there are none. Dedupe by src. */}}
   {{ $shots := slice }}
+  {{ $seen := slice }}
   {{ $source := where .Site.RegularPages "Type" "post" }}
   {{ with .Site.GetPage "/categories/photos" }}{{ $source = .Pages }}{{ end }}
   {{ range $source.ByDate.Reverse }}
     {{ $cap := .Title | default (.Date.Format "January 2006") }}
     {{ $url := .Permalink }}
-    {{ with .Params.images }}
-      {{ range . }}
-        {{ $shots = $shots | append (dict "src" . "cap" $cap "url" $url) }}
-      {{ end }}
-    {{ else }}
-      {{ with .Params.image }}
-        {{ $shots = $shots | append (dict "src" . "cap" $cap "url" $url) }}
+    {{ $imgs := slice }}
+    {{ with .Params.images }}{{ $imgs = . }}
+    {{ else }}{{ with .Params.image }}{{ $imgs = slice . }}{{ end }}{{ end }}
+    {{ if not $imgs }}
+      {{ range $m := findRE `<img[^>]+src="[^"]+"` .Content }}
+        {{ $imgs = $imgs | append (replaceRE `.*src="([^"]+)".*` "$1" $m) }}
       {{ end }}
     {{ end }}
-    {{ range $m := findRE `<img[^>]+src="[^"]+"` .Content }}
-      {{ $src := replaceRE `.*src="([^"]+)".*` "$1" $m }}
-      {{ $shots = $shots | append (dict "src" $src "cap" $cap "url" $url) }}
+    {{ range $imgs }}
+      {{ if not (in $seen .) }}
+        {{ $seen = $seen | append . }}
+        {{ $shots = $shots | append (dict "src" . "cap" $cap "url" $url) }}
+      {{ end }}
     {{ end }}
   {{ end }}
 

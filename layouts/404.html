@@ -1,0 +1,16 @@
+{{ define "body_class" }}page-template{{ end }}
+{{ define "title" }}{{ .Site.Title }} - Page not found{{ end }}
+{{ define "main" }}
+<main class="content" role="main">
+  <article class="post page">
+    <header class="post-header">
+      <div class="post-eyebrow">404</div>
+      <h1 class="post-title">This page wandered off.</h1>
+    </header>
+    <section class="post-content">
+      <p>The page you were looking for is not here. It may have moved, or never existed. Either way, the good stuff is still easy to find.</p>
+      <p><a href="{{ "/" | relLangURL }}">Back to the Index</a></p>
+    </section>
+  </article>
+</main>
+{{ end }}

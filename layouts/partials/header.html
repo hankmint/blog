@@ -1,14 +1,16 @@
 <header class="main-header">
 	<div class="masthead-inner">
+		{{ $brand := "" }}
+		{{ if .Site.Params.logoTitle }}{{ $brand = .Site.Params.logoTitle }}{{ else }}{{ $brand = .Site.Title }}{{ end }}
+		{{ if .IsHome }}
 		<h1 class="h-card blog-title">
-			<a class="u-url p-name" href="{{ "/" | relLangURL }}">
-				{{ if .Site.Params.logoTitle }}
-					{{ .Site.Params.logoTitle | safeHTML }}
-				{{ else }}
-					{{ .Site.Title }}
-				{{ end }}
-			</a>
+			<a class="u-url p-name" href="{{ "/" | relLangURL }}">{{ $brand | safeHTML }}</a>
 		</h1>
+		{{ else }}
+		<p class="h-card blog-title">
+			<a class="u-url p-name" href="{{ "/" | relLangURL }}">{{ $brand | safeHTML }}</a>
+		</p>
+		{{ end }}
 		<h2 class="p-note blog-description">{{ .Site.Params.description | safeHTML }}</h2>
 
 		<nav class="nav" role="navigation">

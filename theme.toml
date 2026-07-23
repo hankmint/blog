@@ -8,7 +8,7 @@ description = "Editorial long-form theme for MINT by Nana Kofi. Based on Arabica
 homepage = "https://nanakofiwrites.com/"
 tags = ["blog", "editorial", "minimal", "microblog"]
 features = ["editorial", "dark-mode", "gallery"]
-min_version = "0.41"
+min_version = "0.48"
 
 [author]
   name = "Nana Kofi"

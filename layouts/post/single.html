@@ -21,7 +21,7 @@
         <span>&middot;</span>
         <span>{{ .ReadingTime }} min read</span>
       </section>
-      {{ with .Params.image }}<img class="u-featured" src="{{ . }}" alt="{{ $.Title }}" />{{ end }}
+      {{ with .Params.image }}<img class="u-featured" src="{{ . }}" alt="{{ $.Title | default "Photo by Nana Kofi" }}" />{{ end }}
     </header>
 
     <section class="post-content e-content">
@@ -52,10 +52,5 @@
       {{ end }}
     </footer>
   </article>
-
-{{ if .Site.Params.include_conversation }}
-<script type="text/javascript" src="https://micro.blog/conversation.js?url={{ .Permalink }}"></script>
-{{ end }}
-
 </main>
 {{ end }}

@@ -7,7 +7,7 @@
         {{ partial "footer.html" . }}
 
         <!-- Gallery lightbox (used by the gallery page) -->
-        <div class="mint-lightbox" id="mint-lightbox" aria-hidden="true">
+        <div class="mint-lightbox" id="mint-lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer" aria-hidden="true">
           <button class="lb-close" type="button" aria-label="Close">&times;</button>
           <button class="lb-btn lb-prev" type="button" aria-label="Previous">&#8249;</button>
           <button class="lb-btn lb-next" type="button" aria-label="Next">&#8250;</button>

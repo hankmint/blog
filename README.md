@@ -29,11 +29,11 @@ This is a theme, not a full site. To preview locally, mount it in a small Hugo s
 
 ## Structure
 
-- `layouts/` — templates (home, post, list/topic, gallery, about, partials).
-- `static/css/` — `fonts.css` (self-hosted Fraunces + Newsreader) and `mint.css` (the editorial stylesheet).
-- `static/js/` — `mint.js` (dark-mode toggle and gallery lightbox).
-- `static/fonts/` — self-hosted woff2 (no external font requests).
-- `config.json`, `plugin.json`, `theme.toml` — theme metadata and defaults.
+- `layouts/`: templates (home, post, list/topic, gallery, about, partials).
+- `static/css/`: `fonts.css` (self-hosted Fraunces + Newsreader) and `mint.css` (the editorial stylesheet).
+- `static/js/`: `mint.js` (dark-mode toggle and gallery lightbox).
+- `static/fonts/`: self-hosted woff2 (no external font requests).
+- `config.json`, `plugin.json`, `theme.toml`: theme metadata and defaults.
 
 ## Credits
 
