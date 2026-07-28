@@ -212,8 +212,23 @@ not exist.
 - **Homepage:** change `layouts/index.html` so the year index includes every post, not only titled
   ones. Untitled posts render with their opening line as the entry text. The featured block at the
   top continues to show titled posts only, and simply renders nothing until Kay writes one.
-- **Nav:** remove Building, Creative and Life from the navigation until there is content in them.
-  The category archive templates stay in the repo, unreferenced, ready to return.
+- **Nav:** advertise nothing that is empty.
+
+  Corrected during planning: the rooms were never in the navigation to begin with. The nav is not
+  hardcoded, it ranges over `.Site.Menus.main`, which the imported pages populate via their own
+  `menu: main` front matter. So the nav is About, Photos, Stories, Replies, Archive.
+
+  The principle still applies, to different pages. `photos.md` and `archive.md` carry Micro.blog
+  layouts (`list.photoshtml`, `list.archivehtml`) that do not exist in the MINT theme, so both would
+  render blank. `stories.md` and `replies.md` are empty, and Micro.blog's conversation system does
+  not come with us, so `replies` has no future source of content. Archive, Stories and Replies leave
+  the nav and keep their URLs. The category templates stay in the repo, unreferenced, ready for when
+  there is writing to fill the rooms.
+
+- **The gallery does not currently exist.** `layouts/gallery/single.html` only renders for a page
+  with `type: gallery`, and no content declares it. The gallery and its lightbox, a headline feature
+  of the MINT theme, would not have appeared at all. Fixed by declaring `type: gallery` on
+  `photos.md`, which puts the gallery at `/photos/` and in the nav.
 
 ### 1.4 Captions
 
