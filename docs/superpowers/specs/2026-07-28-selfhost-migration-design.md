@@ -63,6 +63,30 @@ Micro.blog rewrites this to the absolute CDN URL at render time. Confirmed again
 Hugo does no such rewriting. Left untouched, a post at `/2025/12/21/foo.html` would resolve
 `uploads/...` relative to that directory and every image would 404.
 
+### The content does not match what the theme expects
+
+Discovered while planning, after the design above was first written. All three are verified.
+
+- **Not one of the 18 posts has a `title:`.** Every post is a titleless micro post.
+  `layouts/index.html` line 3 filters `where ... "Title" "!=" ""`, so as shipped the homepage
+  would render zero featured essays and an index reading "0 essays". The site would launch looking
+  abandoned.
+- **Not one of the 18 posts has `categories:`.** The three rooms (Building, Creative, Life) would
+  all be empty, and every `/categories/<slug>/` page would render nothing.
+- **The gallery reads front matter first.** `layouts/gallery/single.html` line 17 prefers
+  `.Params.images` and only scans the body when that is absent. There are **81** Micro.blog CDN
+  URLs in front matter across the `images:`, `photos:` and `photos_with_metadata:` fields. Rewriting
+  only the body `<img src>` would leave the gallery pulling every photograph from Micro.blog's
+  servers after the migration, which defeats the point of leaving.
+
+Kay's decisions on the first two:
+
+- **Homepage shows everything.** The year index carries all 18 posts. Untitled posts render with
+  their opening line as the entry text. Titled posts still get the featured treatment at the top as
+  he writes them. The site looks lived-in on day one.
+- **The three rooms come out of the nav** until there is enough writing to fill them. Nothing on the
+  site should promise something it does not have. They return later.
+
 ### Permalinks are already safe
 
 Each post carries its own permalink in front matter, for example
@@ -165,10 +189,31 @@ and verify each is a valid non-empty image. This is the only irreversible risk i
   `layouts/index 2.html`, `theme 2.toml`, and the rest). They are the same class of cruft that
   breaks CLI builds on `knodai_v1`.
 
-### 1.3 Rewrite image paths
+### 1.3 Rewrite image paths, in bodies AND front matter
 
-Rewrite every `<img src="uploads/...">` in post bodies to site-absolute `/uploads/...`.
-Then prove it: build the site and confirm all 28 images resolve against local files with zero 404s.
+Two rewrites, both required:
+
+1. Every `<img src="uploads/...">` in post bodies becomes site-absolute `/uploads/...`.
+2. Every Micro.blog CDN URL in front matter becomes a local path. This covers `images:`, `photos:`
+   and `photos_with_metadata:` (including its nested `url:` and `sizes:` entries), 81 references in
+   total. Without this the gallery keeps loading from `cdn.uploads.micro.blog`, because
+   `layouts/gallery/single.html` prefers `.Params.images` over the body.
+
+Then prove it: build the site and assert that zero references to `cdn.uploads.micro.blog` or
+`s3.amazonaws.com/micro.blog` remain in the generated HTML, and that all 28 images resolve against
+local files with no 404s.
+
+Note that `photos_with_metadata.sizes` points at `-m` and `-s` resized variants that Micro.blog
+generated and which we do not have. Those keys are dropped rather than rewritten to files that do
+not exist.
+
+### 1.3b Make the site show its own content
+
+- **Homepage:** change `layouts/index.html` so the year index includes every post, not only titled
+  ones. Untitled posts render with their opening line as the entry text. The featured block at the
+  top continues to show titled posts only, and simply renders nothing until Kay writes one.
+- **Nav:** remove Building, Creative and Life from the navigation until there is content in them.
+  The category archive templates stay in the repo, unreferenced, ready to return.
 
 ### 1.4 Captions
 
@@ -242,12 +287,16 @@ If Indiekit is ever down, the blog is unaffected and Kay can still write in the 
 1. nanakofiwrites.com serves the MINT design, in light and dark mode.
 2. Every post Kay chooses to keep is present at its original URL. No permalink changes, no
    redirects needed. (18 posts carry over unless the three April 2025 test posts are dropped.)
-3. All 28 photographs served from Kay's own domain. Zero 404s. No dependency on Micro.blog's CDN.
-4. `/feed.json` validates as JSON Feed and `/feed.xml` as RSS.
-5. A real post published after cutover reaches Bluesky and Mastodon via the existing Micro.blog
+3. All 28 photographs served from Kay's own domain. Zero 404s. Zero references to
+   `cdn.uploads.micro.blog` or `s3.amazonaws.com/micro.blog` anywhere in the generated HTML.
+   The gallery shows every photo, loaded from local files.
+4. The homepage is not empty. All 18 posts appear in the year index on day one, and no empty room
+   is advertised in the nav.
+5. `/feed.json` validates as JSON Feed and `/feed.xml` as RSS.
+6. A real post published after cutover reaches Bluesky and Mastodon via the existing Micro.blog
    Source, with no settings changed on that page.
-6. Kay can publish a photo post with a caption from his phone.
-7. (Movement 2) A Sunlit photo story publishes to nanakofiwrites.com.
+7. Kay can publish a photo post with a caption from his phone.
+8. (Movement 2) A Sunlit photo story publishes to nanakofiwrites.com.
 
 ## Out of scope
 
