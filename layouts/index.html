@@ -1,13 +1,24 @@
 {{ define "main" }}
 <main class="content h-feed mint-home" role="main">
-  {{ $posts := where (where .Site.RegularPages "Type" "post") "Title" "!=" "" }}
-  {{ $posts = $posts.ByDate.Reverse }}
+  {{/* Two sequences, deliberately.
+
+       $titled drives the featured block at the top, because a standfirst only
+       makes sense for a piece that has a title. It renders nothing until there
+       is one, which is correct.
+
+       $posts is every post, and drives the year index. All of the imported
+       Micro.blog posts are untitled micro posts, so filtering the index to
+       titled posts as well would leave the homepage reading "0 posts" on the
+       day the site goes live. Untitled entries show their opening line. */}}
+  {{ $titled := (where (where .Site.RegularPages "Type" "post") "Title" "!=" "").ByDate.Reverse }}
+  {{ $posts := (where .Site.RegularPages "Type" "post").ByDate.Reverse }}
   {{ $n := int (.Site.Params.featuredCount | default 2) }}
+  {{ $featured := first $n $titled }}
 
   <section class="mint-lede">
     <div class="mint-eyebrow">{{ .Site.Params.description | default "Latest" | safeHTML }}</div>
     <div class="mint-featured">
-      {{ range first $n $posts }}
+      {{ range $featured }}
         <article class="feat h-entry">
           <h2 class="p-name"><a class="u-url" href="{{ .Permalink }}">{{ .Title }}</a></h2>
           {{ with .Summary }}<p class="stand p-summary">{{ . | plainify | truncate 190 }}</p>{{ end }}
@@ -24,9 +35,9 @@
   <section class="mint-index">
     <div class="mint-index-head">
       <h2>The Index</h2>
-      <span class="count">{{ len $posts }} {{ cond (eq (len $posts) 1) "essay" "essays" }}</span>
+      <span class="count">{{ len $posts }} {{ cond (eq (len $posts) 1) "post" "posts" }}</span>
     </div>
-    {{ $rest := after $n $posts }}
+    {{ $rest := complement $featured $posts }}
     {{ $year := "" }}
     {{ range $rest }}
       {{ $y := .Date.Format "2006" }}
@@ -38,7 +49,7 @@
       {{ end }}
       <li><a class="mint-entry h-entry" href="{{ .Permalink }}">
         <span class="date">{{ .Date.Format "Jan 02" }}</span>
-        <span class="ttl p-name">{{ .Title }}</span>
+        <span class="ttl p-name">{{ with .Title }}{{ . }}{{ else }}{{ .Plain | plainify | truncate 90 }}{{ end }}</span>
         <span class="topic">{{ with .Params.categories }}<span class="dot"></span>{{ index . 0 }}{{ end }}</span>
       </a></li>
     {{ end }}

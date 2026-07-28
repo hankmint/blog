@@ -127,6 +127,51 @@ PY
   check $? "feed.xml is well-formed RSS with all 18 items"
 fi
 
+# --- The site must show its own content ---
+#
+# Every one of the 18 posts is an untitled micro post, and the homepage index
+# filtered to titled posts only. Shipped unchanged it would have read "0 essays"
+# on launch day.
+ENTRIES=$(grep -c 'class="mint-entry' public/index.html || true)
+[ "${ENTRIES:-0}" -ge 16 ]; check $? "homepage index lists the posts (found ${ENTRIES:-0} entries)"
+
+if grep -qE '>0 (essays|posts)<' public/index.html; then fail "homepage reports zero posts"; else pass "homepage does not report zero posts"; fi
+
+# The gallery only renders for a page with type: gallery. Nothing declared it,
+# so the gallery and its lightbox did not exist at all.
+[ -f public/photos/index.html ]; check $? "the gallery page is generated at /photos/"
+if [ -f public/photos/index.html ]; then
+  SHOTS=$(grep -c 'class="mint-shot"' public/photos/index.html || true)
+  [ "${SHOTS:-0}" -ge 20 ]; check $? "the gallery shows the photographs (found ${SHOTS:-0})"
+  if grep -q 'mint-gallery-empty' public/photos/index.html; then fail "the gallery says it is empty"; else pass "the gallery is not empty"; fi
+fi
+
+# No nav link may lead to a page with nothing on it.
+python3 - <<'PY' 2>&1
+import pathlib, re, sys
+home = pathlib.Path("public/index.html").read_text(encoding="utf-8")
+nav = re.search(r'<nav class="nav".*?</nav>', home, re.DOTALL)
+if not nav:
+    print("    no nav found", file=sys.stderr); sys.exit(1)
+links = sorted(set(re.findall(r'href="(/[^"]*)"', nav.group(0))))
+bad = []
+for href in links:
+    page = pathlib.Path("public" + href.rstrip("/") + "/index.html")
+    if href == "/":
+        continue
+    if not page.is_file():
+        bad.append(f"{href} has no generated page"); continue
+    body = re.search(r"<main.*?</main>", page.read_text(encoding="utf-8"), re.DOTALL)
+    text = re.sub(r"<[^>]+>", " ", body.group(0) if body else "")
+    if len(text.split()) < 12:
+        bad.append(f"{href} renders almost nothing ({len(text.split())} words)")
+print("    nav links:", ", ".join(links) or "(none)", file=sys.stderr)
+for b in bad:
+    print("    ", b, file=sys.stderr)
+sys.exit(1 if bad else 0)
+PY
+check $? "every nav link leads to a page with content on it"
+
 echo
 echo "Results:"
 if [ "$FAILED" -eq 0 ]; then echo "ALL ASSERTIONS PASSED"; else echo "THERE WERE FAILURES" >&2; fi
