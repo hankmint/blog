@@ -1,0 +1,58 @@
+baseURL = "https://nanakofiwrites.com/"
+languageCode = "en"
+defaultContentLanguage = "en"
+title = "M I N T"
+enableRobotsTXT = true
+pluralizeListTitles = false
+
+[pagination]
+  pagerSize = 25
+
+[services.rss]
+  limit = 25
+
+[taxonomies]
+  category = "categories"
+
+# Required. Post bodies imported from Micro.blog contain raw HTML img tags.
+[markup.goldmark.renderer]
+  unsafe = true
+
+# Feed output.
+#
+# SAFETY CRITICAL. https://nanakofiwrites.com/feed.json is registered on the
+# Micro.blog Sources page and is what drives cross-posting to Bluesky, Mastodon,
+# Threads, LinkedIn, Tumblr, Medium, Flickr, Nostr, Pixelfed, PeerTube, Day One
+# and YouTube. If that path stops returning valid JSON Feed, cross-posting stops
+# silently: nothing errors, nothing warns, posts simply stop reaching the
+# networks.
+#
+# These four blocks are carried over verbatim from Micro.blog's own exported
+# config.json, so the feeds keep the exact paths and shape their relay reads.
+[mediaTypes."application/json"]
+  suffixes = ["json"]
+
+[outputFormats.RSS]
+  baseName = "feed"
+
+[outputFormats.JSON]
+  baseName = "feed"
+  mediaType = "application/json"
+
+[outputs]
+  home = ["HTML", "RSS", "JSON"]
+  page = ["HTML"]
+  section = ["HTML"]
+  taxonomy = ["HTML"]
+  term = ["HTML"]
+
+# MINT theme params, carried over from the old Micro.blog config.json.
+[params]
+  dateFormatToUse = "January 02, 2006"
+  logoTitle = '<span class="mark">MINT</span><span class="by">by Nana Kofi</span>'
+  description = "On building, creativity, and life."
+  featuredCount = 2
+  archive-paginate = 100
+
+[params.author]
+  name = "Nana Kofi"
