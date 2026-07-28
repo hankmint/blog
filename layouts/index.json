@@ -1,0 +1,50 @@
+{{- /* JSON Feed.
+
+       Adopted from the Micro.blog export theme (MIT, Copyright 2019 Micro.blog)
+       so the feed keeps the exact shape their cross-posting relay already reads.
+
+       SAFETY CRITICAL. https://nanakofiwrites.com/feed.json is registered on the
+       Micro.blog Sources page and drives cross-posting to Bluesky, Mastodon,
+       Threads, LinkedIn, Tumblr, Medium, Flickr, Nostr, Pixelfed, PeerTube,
+       Day One and YouTube. Do not rename this file, do not move it, and do not
+       change outputFormats.JSON.baseName in hugo.toml. If this stops being
+       served at /feed.json, cross-posting stops with no error anywhere.
+
+       The guid is preserved as the item id. Those guids are what Micro.blog and
+       downstream networks use to recognise a post they have already seen, so
+       changing them would re-post the entire back catalogue. */ -}}
+{
+	"version": "https://jsonfeed.org/version/1",
+	"title": {{ .Site.Title | jsonify }},
+	"home_page_url": "{{ .Site.BaseURL }}",
+	"feed_url": "{{ .Site.BaseURL }}feed.json",
+	"description": {{ .Site.Params.description | plainify | jsonify }},
+	"items": [
+		{{- $list := first 25 (where .Site.RegularPages "Type" "post").ByDate.Reverse -}}
+		{{- $len := (len $list) -}}
+		{{ range $index, $value := $list }}
+			{
+				{{ if .Params.guid -}}
+				"id": "{{ .Params.guid }}",
+				{{- else -}}
+				"id": "{{ .Permalink }}",
+				{{- end }}
+				{{ if .Title -}}
+				"title": {{ .Title | jsonify }},
+				{{- end -}}
+				{{- $s := .Content | jsonify -}}
+				{{- $s := replace $s "\\u003c" "<" -}}
+				{{- $s := replace $s "\\u003e" ">" -}}
+				{{- $s := replace $s "\\u0026" "&" }}
+				"content_html": {{ $s }},
+				"date_published": "{{ .Date.Format "2006-01-02T15:04:05-07:00" }}",
+				"url": "{{ .Permalink }}"
+				{{- with .Params.categories -}}
+				,
+				"tags": {{ . | jsonify }}
+				{{- end }}
+			}
+			{{- if ne (add $index 1) $len -}},{{- end -}}
+		{{ end }}
+	]
+}

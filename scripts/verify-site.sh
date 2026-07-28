@@ -74,6 +74,59 @@ for u in $(grep -rhoE '^url: "[^"]+"' content | sed 's|^url: "||; s|"$||' | sort
 done
 [ "$BADURL" = "0" ]; check $? "every declared permalink resolves ($BADURL missing)"
 
+# --- Feeds ---
+#
+# SAFETY CRITICAL and silent when it breaks. /feed.json is registered on the
+# Micro.blog Sources page and drives cross-posting to twelve networks. If it
+# 404s or is malformed, nothing errors anywhere: posts just stop arriving.
+[ -f public/feed.json ]; check $? "public/feed.json exists"
+[ -f public/feed.xml ];  check $? "public/feed.xml exists"
+
+if [ -f public/feed.json ]; then
+  python3 - <<'PY' 2>&1
+import json, sys
+try:
+    d = json.load(open("public/feed.json"))
+except Exception as e:
+    print("    invalid JSON:", e, file=sys.stderr); sys.exit(1)
+problems = []
+if not str(d.get("version", "")).startswith("https://jsonfeed.org/version/"):
+    problems.append("missing or wrong jsonfeed version")
+if not str(d.get("feed_url", "")).endswith("/feed.json"):
+    problems.append(f"feed_url must end in /feed.json, got {d.get('feed_url')!r}")
+items = d.get("items", [])
+if len(items) != 18:
+    problems.append(f"expected 18 items, got {len(items)}")
+for i, it in enumerate(items):
+    for key in ("id", "url", "date_published", "content_html"):
+        if not it.get(key):
+            problems.append(f"item {i} missing {key}")
+    if "micro.blog" in str(it.get("url", "")):
+        problems.append(f"item {i} url still points at micro.blog")
+for p in problems[:8]:
+    print("    ", p, file=sys.stderr)
+sys.exit(1 if problems else 0)
+PY
+  check $? "feed.json is a valid JSON Feed with all 18 items"
+fi
+
+if [ -f public/feed.xml ]; then
+  # Existence is not validity. Hugo HTML-escapes a literal <?xml declaration
+  # unless it is passed through safeHTML, which produced a feed.xml that looked
+  # perfectly fine in a text editor and would not parse in any reader.
+  python3 - <<'PY' 2>&1
+import sys, xml.dom.minidom
+try:
+    x = xml.dom.minidom.parse("public/feed.xml")
+except Exception as e:
+    print("    feed.xml does not parse:", e, file=sys.stderr); sys.exit(1)
+items = x.getElementsByTagName("item")
+if len(items) != 18:
+    print(f"    expected 18 items, got {len(items)}", file=sys.stderr); sys.exit(1)
+PY
+  check $? "feed.xml is well-formed RSS with all 18 items"
+fi
+
 echo
 echo "Results:"
 if [ "$FAILED" -eq 0 ]; then echo "ALL ASSERTIONS PASSED"; else echo "THERE WERE FAILURES" >&2; fi
