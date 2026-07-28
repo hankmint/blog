@@ -104,6 +104,10 @@ nav.nav a.nav-current::after { right: 0; }
 
 /* ---------- home: lede + featured ---------- */
 .mint-lede { padding: 3.6rem 0 1.2rem; }
+/* No titled essays yet, so there is no featured block. Tighten the gap
+   so the index does not float below a band of nothing. */
+.mint-lede-bare { padding: 3.6rem 0 0; }
+.mint-lede-bare + .mint-index { margin-top: 1.6rem; padding-top: 2rem; }
 .mint-eyebrow {
   font-family: var(--sans); font-size: .7rem; letter-spacing: .2em; text-transform: uppercase;
   color: var(--accent); margin-bottom: 1.4rem;

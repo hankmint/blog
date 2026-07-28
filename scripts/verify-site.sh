@@ -10,7 +10,9 @@ fail() { echo "  FAIL  $1" >&2; FAILED=1; }
 check() { if [ "$1" = "0" ]; then pass "$2"; else fail "$2"; fi }
 
 echo "Building..."
-if hugo --quiet --destination public; then
+# --cleanDestinationDir matters. Hugo leaves files behind for content that no
+# longer exists, so a deleted post keeps its page in public/ and gets deployed.
+if hugo --quiet --cleanDestinationDir --destination public; then
   pass "hugo build exits 0"
 else
   fail "hugo build exits 0"
@@ -73,6 +75,12 @@ for u in $(grep -rhoE '^url: "[^"]+"' content | sed 's|^url: "||; s|"$||' | sort
   [ -f "$target" ] || { echo "    permalink missing: $u" >&2; BADURL=$((BADURL+1)); }
 done
 [ "$BADURL" = "0" ]; check $? "every declared permalink resolves ($BADURL missing)"
+
+# No Go value should ever leak into the rendered page. This catches a map or a
+# slice printed directly by a template, which reads as "map[name:Nana Kofi]" or
+# "[a b c]" on the live site and is easy to miss in a quick look.
+GOLEAK=$(grep -rlE 'map\[[a-zA-Z]+:' public --include='*.html' 2>/dev/null | wc -l | tr -d ' ')
+[ "$GOLEAK" = "0" ]; check $? "no raw Go values rendered into the HTML (found $GOLEAK files)"
 
 # --- Feeds ---
 #

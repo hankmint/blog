@@ -15,7 +15,9 @@
       {{ with .Params.categories }}<div class="post-eyebrow">{{ index . 0 }}</div>{{ end }}
       {{ if .Title }}<h1 class="post-title p-name">{{ .Title }}</h1>{{ end }}
       <section class="post-meta">
-        <span class="p-author h-card">By {{ .Site.Params.author | default "Nana Kofi" }}</span>
+        {{/* author is a map in hugo.toml, the conventional Hugo shape. Printing
+             it directly renders the literal Go map, "map[name:Nana Kofi]". */}}
+        <span class="p-author h-card">By {{ .Site.Params.author.name | default "Nana Kofi" }}</span>
         <span>&middot;</span>
         <a class="u-url" href="{{ .Permalink }}"><time class="post-date dt-published" datetime="{{ .Date.Format "2006-01-02 15:04:05 -0700" }}">{{ .Date.Format (.Site.Params.dateFormatToUse | default "January 02, 2006") }}</time></a>
         <span>&middot;</span>

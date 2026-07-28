@@ -15,10 +15,14 @@
   {{ $n := int (.Site.Params.featuredCount | default 2) }}
   {{ $featured := first $n $titled }}
 
-  <section class="mint-lede">
+  <section class="mint-lede{{ if not $featured }} mint-lede-bare{{ end }}">
     <div class="mint-eyebrow">{{ .Site.Params.description | default "Latest" | safeHTML }}</div>
+    {{/* Only render the featured container when there is something to put in
+         it. An empty flex container still occupies its padding and leaves a
+         conspicuous band of nothing above the index. */}}
+    {{ with $featured }}
     <div class="mint-featured">
-      {{ range $featured }}
+      {{ range . }}
         <article class="feat h-entry">
           <h2 class="p-name"><a class="u-url" href="{{ .Permalink }}">{{ .Title }}</a></h2>
           {{ with .Summary }}<p class="stand p-summary">{{ . | plainify | truncate 190 }}</p>{{ end }}
@@ -30,6 +34,7 @@
         </article>
       {{ end }}
     </div>
+    {{ end }}
   </section>
 
   <section class="mint-index">
