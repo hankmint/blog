@@ -1,0 +1,23 @@
+{{- /* Turns Markdown images into captioned figures.
+
+         ![alt text](/uploads/2026/photo.jpg "the caption")
+
+       becomes a <figure> with a <figcaption>, picking up the caption styling
+       that has been sitting unused in static/css/mint.css since the theme was
+       built. Without this hook Hugo puts the caption in a title attribute,
+       where it shows only as a tooltip and never appears on the page.
+
+       Deliberately a render hook rather than a shortcode: this is plain
+       Markdown, so any editor can produce it, it survives changing editors,
+       and it does not litter the posts with template syntax.
+
+       With no title it renders a plain img and no empty caption. */ -}}
+{{- $alt := or .PlainText .Text -}}
+{{- if .Title -}}
+<figure>
+  <img src="{{ .Destination | safeURL }}" alt="{{ $alt }}" loading="lazy" />
+  <figcaption>{{ .Title }}</figcaption>
+</figure>
+{{- else -}}
+<img src="{{ .Destination | safeURL }}" alt="{{ $alt }}" loading="lazy" />
+{{- end -}}

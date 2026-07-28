@@ -172,6 +172,61 @@ sys.exit(1 if bad else 0)
 PY
 check $? "every nav link leads to a page with content on it"
 
+# --- Captioned images ---
+#
+# static/css/mint.css has styled figure and figcaption since the theme was built,
+# but the theme had no render hook and no shortcode, so nothing ever emitted a
+# <figure> and the styling was unreachable.
+#
+# The test post is created here, built into a throwaway directory, and removed,
+# so the behaviour is always tested and a test post never appears on the live
+# blog or in the feeds.
+CAPDIR=$(mktemp -d)
+CAPPOST="content/2026/07/28/zz-caption-check.md"
+mkdir -p "$(dirname "$CAPPOST")"
+cat > "$CAPPOST" <<'EOF'
+---
+date: 2026-07-28T12:00:00-04:00
+type: post
+title: "Caption check"
+url: "/zz-caption-check.html"
+---
+![Nani in the snow](/uploads/2026/548458a206d94b7f827547b2a14d35bb.jpg "Nani, the morning after the storm")
+
+![Just the picture](/uploads/2025/1-2.png)
+EOF
+hugo --quiet --destination "$CAPDIR" >/dev/null 2>&1
+CAPOUT="$CAPDIR/zz-caption-check.html"
+if [ -f "$CAPOUT" ]; then
+  python3 - "$CAPOUT" <<'PY' 2>&1
+import pathlib, re, sys
+h = pathlib.Path(sys.argv[1]).read_text()
+problems = []
+figs = re.findall(r"<figure.*?</figure>", h, re.DOTALL)
+if len(figs) != 1:
+    problems.append(f"expected exactly 1 figure, got {len(figs)}")
+elif "Nani, the morning after the storm" not in figs[0]:
+    problems.append("the caption text is not inside the figure")
+elif "<figcaption" not in figs[0]:
+    problems.append("the caption is not in a figcaption")
+elif "1-2.png" in figs[0]:
+    problems.append("the uncaptioned image was wrapped in a figure")
+if re.search(r"<figcaption>\s*</figcaption>", h):
+    problems.append("an empty figcaption was rendered")
+if re.search(r"<p>\s*<figure", h):
+    problems.append("a <figure> was wrapped in a <p>, which is invalid HTML")
+for p in problems:
+    print("    ", p, file=sys.stderr)
+sys.exit(1 if problems else 0)
+PY
+  check $? "a markdown image with a title renders as a captioned <figure>, one without stays a plain img"
+else
+  fail "the caption check post did not build"
+fi
+rm -f "$CAPPOST"
+rmdir -p "$(dirname "$CAPPOST")" 2>/dev/null || true
+rm -rf "$CAPDIR"
+
 echo
 echo "Results:"
 if [ "$FAILED" -eq 0 ]; then echo "ALL ASSERTIONS PASSED"; else echo "THERE WERE FAILURES" >&2; fi

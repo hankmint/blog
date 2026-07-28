@@ -18,6 +18,12 @@ pluralizeListTitles = false
 [markup.goldmark.renderer]
   unsafe = true
 
+# A standalone image on its own line must not be wrapped in a paragraph. The
+# caption render hook emits a <figure>, and a <figure> inside a <p> is invalid
+# HTML that browsers silently tear apart, leaving a stray empty paragraph.
+[markup.goldmark.parser]
+  wrapStandAloneImageWithinParagraph = false
+
 # Feed output.
 #
 # SAFETY CRITICAL. https://nanakofiwrites.com/feed.json is registered on the
