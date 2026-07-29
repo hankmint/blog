@@ -24,10 +24,19 @@
         {{ $imgs = $imgs | append (replaceRE `.*src="([^"]+)".*` "$1" $m) }}
       {{ end }}
     {{ end }}
+    {{/* Resolve each src against the post it came from. Posts written in the
+         editor are page bundles, so their images are relative to the post's own
+         folder. Used verbatim here they would resolve against /photos/ and
+         404. Imported Micro.blog posts already carry site-absolute paths. */}}
+    {{ $base := .RelPermalink }}
     {{ range $imgs }}
-      {{ if not (in $seen .) }}
-        {{ $seen = $seen | append . }}
-        {{ $shots = $shots | append (dict "src" . "cap" $cap "url" $url) }}
+      {{ $src := . }}
+      {{ if not (or (hasPrefix $src "/") (hasPrefix $src "http") (hasPrefix $src "data:")) }}
+        {{ $src = printf "%s%s" $base $src }}
+      {{ end }}
+      {{ if not (in $seen $src) }}
+        {{ $seen = $seen | append $src }}
+        {{ $shots = $shots | append (dict "src" $src "cap" $cap "url" $url) }}
       {{ end }}
     {{ end }}
   {{ end }}

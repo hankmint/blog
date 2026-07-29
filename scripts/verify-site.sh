@@ -21,8 +21,10 @@ else
 fi
 
 # --- Content and images ---
+# Counted, not hard-coded, so publishing a post does not fail the harness. The
+# 18 imported from Micro.blog are the floor: none of them may ever go missing.
 POSTS=$(find content -path 'content/20*' -name '*.md' | wc -l | tr -d ' ')
-[ "$POSTS" = "18" ]; check $? "18 posts present in content/ (found $POSTS)"
+[ "$POSTS" -ge 18 ]; check $? "all posts present in content/ ($POSTS, floor is the 18 imported)"
 
 # No generated page may reference Micro.blog's servers. This is what keeps the
 # site independent: rescuing the files is not enough if the HTML still asks
@@ -61,7 +63,7 @@ PY
 check $? "every image reference resolves, relative to its own page"
 
 IMGCOUNT=$(find static/uploads -type f | wc -l | tr -d ' ')
-[ "$IMGCOUNT" = "28" ]; check $? "28 photographs present in static/uploads (found $IMGCOUNT)"
+[ "$IMGCOUNT" -ge 28 ]; check $? "the 28 rescued photographs are all still present (found $IMGCOUNT)"
 
 # Permalinks must not change. Every url: in front matter must exist as a
 # generated page at exactly that path. Those URLs are already live and already
@@ -75,6 +77,30 @@ for u in $(grep -rhoE '^url: "[^"]+"' content | sed 's|^url: "||; s|"$||' | sort
   [ -f "$target" ] || { echo "    permalink missing: $u" >&2; BADURL=$((BADURL+1)); }
 done
 [ "$BADURL" = "0" ]; check $? "every declared permalink resolves ($BADURL missing)"
+
+# A blob: URL is a temporary in-browser reference that dies with the tab. The
+# editor can save one if an image is still uploading when the post is saved,
+# which looks fine in the editor and is a permanently broken image on the site.
+BLOBS=$(grep -rlE 'blob:https?:' content 2>/dev/null | wc -l | tr -d ' ')
+[ "$BLOBS" = "0" ]; check $? "no blob: image references left in content (found $BLOBS files)"
+if [ "$BLOBS" != "0" ]; then grep -rlE 'blob:https?:' content | sed 's/^/     /' >&2; fi
+
+# Images saved beside a post only publish if the post is index.md inside that
+# folder. A sibling folder next to slug.md is silently ignored by Hugo.
+python3 - <<'PY' 2>&1
+import pathlib, sys
+bad = []
+for md in pathlib.Path("content").rglob("*.md"):
+    if md.name == "index.md":
+        continue
+    twin = md.with_suffix("")
+    if twin.is_dir() and any(twin.iterdir()):
+        bad.append(f"{md} has a sibling folder {twin.name}/ that Hugo will ignore")
+for b in bad:
+    print("    ", b, file=sys.stderr)
+sys.exit(1 if bad else 0)
+PY
+check $? "no post has an orphaned sibling asset folder"
 
 # No Go value should ever leak into the rendered page. This catches a map or a
 # slice printed directly by a template, which reads as "map[name:Nana Kofi]" or
@@ -103,8 +129,8 @@ if not str(d.get("version", "")).startswith("https://jsonfeed.org/version/"):
 if not str(d.get("feed_url", "")).endswith("/feed.json"):
     problems.append(f"feed_url must end in /feed.json, got {d.get('feed_url')!r}")
 items = d.get("items", [])
-if len(items) != 18:
-    problems.append(f"expected 18 items, got {len(items)}")
+if len(items) < 18:
+    problems.append(f"expected at least the 18 imported posts, got {len(items)}")
 for i, it in enumerate(items):
     for key in ("id", "url", "date_published", "content_html"):
         if not it.get(key):
@@ -115,7 +141,7 @@ for p in problems[:8]:
     print("    ", p, file=sys.stderr)
 sys.exit(1 if problems else 0)
 PY
-  check $? "feed.json is a valid JSON Feed with all 18 items"
+  check $? "feed.json is a valid JSON Feed with every post in it"
 fi
 
 if [ -f public/feed.xml ]; then
@@ -129,10 +155,10 @@ try:
 except Exception as e:
     print("    feed.xml does not parse:", e, file=sys.stderr); sys.exit(1)
 items = x.getElementsByTagName("item")
-if len(items) != 18:
-    print(f"    expected 18 items, got {len(items)}", file=sys.stderr); sys.exit(1)
+if len(items) < 18:
+    print(f"    expected at least the 18 imported posts, got {len(items)}", file=sys.stderr); sys.exit(1)
 PY
-  check $? "feed.xml is well-formed RSS with all 18 items"
+  check $? "feed.xml is well-formed RSS with every post in it"
 fi
 
 # --- The site must show its own content ---
