@@ -14,6 +14,10 @@ backend:
   name: github
   repo: hankmint/blog
   branch: main
+  # The sign-in worker, deployed from sveltia/sveltia-cms-auth into Kay's own
+  # Cloudflare account. This is what makes "Sign in with GitHub" a single tap on
+  # a phone, instead of creating and pasting a personal access token per device.
+  base_url: https://sveltia-cms-auth.exploremint17.workers.dev
 
 # Where uploaded photographs go, and how they are referenced in a post.
 media_folder: static/uploads/2026
