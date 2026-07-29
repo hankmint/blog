@@ -102,6 +102,14 @@ sys.exit(1 if bad else 0)
 PY
 check $? "no post has an orphaned sibling asset folder"
 
+# A <figure> inside a <p> is invalid HTML that browsers tear apart, leaving a
+# stray empty paragraph after the photograph. It happens whenever an image is
+# written directly after text instead of on its own line. Checked across the
+# whole site, not just the caption test post, because that is where it appeared.
+NESTEDFIG=$(grep -rloE '<p>[^<]*<figure' public --include='*.html' 2>/dev/null | wc -l | tr -d ' ')
+[ "$NESTEDFIG" = "0" ]; check $? "no <figure> is nested inside a <p> ($NESTEDFIG pages)"
+if [ "$NESTEDFIG" != "0" ]; then grep -rloE '<p>[^<]*<figure' public --include='*.html' | sed 's/^/     /' >&2; fi
+
 # No Go value should ever leak into the rendered page. This catches a map or a
 # slice printed directly by a template, which reads as "map[name:Nana Kofi]" or
 # "[a b c]" on the live site and is easy to miss in a quick look.
