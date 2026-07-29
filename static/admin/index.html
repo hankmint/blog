@@ -5,6 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex" />
     <title>MINT editor</title>
+    <script>
+      // The site registers a service worker at scope "/", which means it also
+      // claims this page. The editor signs in through a popup that posts a
+      // message back here, and a worker sitting in the middle of that handoff
+      // is a good way to get a blank screen that only fixes itself on refresh.
+      // The editor gains nothing from being cached, so evict it here.
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker
+          .getRegistrations()
+          .then(function (rs) {
+            rs.forEach(function (r) {
+              r.unregister();
+            });
+          })
+          .catch(function () {});
+      }
+    </script>
   </head>
   <body>
     <!-- Sveltia CMS, vendored rather than loaded from a CDN so the editor works

@@ -29,9 +29,20 @@
      Registers the service worker so the blog can be added to a phone home
      screen and survives a dropped connection. Silent if unsupported. */
   if ("serviceWorker" in navigator) {
-    window.addEventListener("load", function () {
-      navigator.serviceWorker.register("/sw.js").catch(function () {});
-    });
+    if (location.pathname.indexOf("/admin") === 0) {
+      // Never let the worker control the editor. The editor signs in through a
+      // popup that posts a message back to this page, and a service worker in
+      // the middle of that handoff is exactly how you get a blank screen that
+      // only fixes itself on refresh. Unregister any worker that already
+      // claimed this page from an earlier visit.
+      navigator.serviceWorker.getRegistrations().then(function (rs) {
+        rs.forEach(function (r) { r.unregister(); });
+      }).catch(function () {});
+    } else {
+      window.addEventListener("load", function () {
+        navigator.serviceWorker.register("/sw.js").catch(function () {});
+      });
+    }
   }
 
   /* ---------- Gallery carousels ----------
