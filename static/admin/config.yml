@@ -1,0 +1,94 @@
+# Sveltia CMS configuration for MINT.
+#
+# Works two ways from the same file:
+#
+#   Locally, with no accounts and no internet: run the site, open /admin/ in a
+#   Chromium browser (Chrome, Edge, Arc, Brave) and choose "Work with Local
+#   Repository". It edits the files in this folder directly. It does NOT do git,
+#   so commits and pushes stay manual.
+#
+#   Deployed, once the repo is on GitHub and an auth worker exists: the same
+#   config signs in through GitHub and commits for you.
+
+backend:
+  name: github
+  repo: hankmint/blog
+  branch: main
+
+# Where uploaded photographs go, and how they are referenced in a post.
+media_folder: static/uploads/2026
+public_folder: /uploads/2026
+
+# Sveltia writes the caption into the markdown image title, which is what
+# layouts/_default/_markup/render-image.html turns into a real <figcaption>.
+media_libraries:
+  default:
+    config:
+      max_file_size: 20000000
+
+collections:
+  - name: posts
+    label: Posts
+    label_singular: Post
+    folder: content
+    # Posts live at content/YYYY/MM/DD/slug.md, the structure carried over from
+    # Micro.blog, which keeps every existing permalink working.
+    path: "{{year}}/{{month}}/{{day}}/{{slug}}"
+    create: true
+    extension: md
+    format: yaml-frontmatter
+    sortable_fields: [date, title]
+    # content/ also holds About, Gallery, Archive, Stories and Replies. Only
+    # things marked as a post belong in this collection.
+    filter:
+      field: type
+      value: post
+    fields:
+      - name: title
+        label: Title
+        widget: string
+        required: false
+        hint: Optional. Leave empty for a short note; give it a title and it becomes a featured essay on the homepage.
+      - name: date
+        label: Date
+        widget: datetime
+        format: "YYYY-MM-DDTHH:mm:ssZ"
+      - name: type
+        label: Type
+        widget: hidden
+        default: post
+      - name: categories
+        label: Room
+        widget: select
+        required: false
+        multiple: true
+        options: [Building, Creative, Life]
+        hint: Optional. Rooms return to the navigation once there is writing in them.
+      - name: body
+        label: Post
+        widget: markdown
+        hint: "Drag a photograph in. To caption it, use the image title: ![alt](/uploads/2026/photo.jpg \"your caption\")"
+
+  - name: pages
+    label: Pages
+    files:
+      - name: about
+        label: About
+        file: content/about.md
+        fields:
+          - { name: title, label: Title, widget: string }
+          - { name: date, label: Date, widget: datetime, format: "YYYY-MM-DDTHH:mm:ssZ" }
+          - { name: url, label: URL, widget: hidden, default: /about/ }
+          - { name: menu, label: Menu, widget: hidden, default: main }
+          - { name: body, label: Page, widget: markdown }
+      - name: gallery
+        label: Gallery intro
+        file: content/photos.md
+        fields:
+          - { name: title, label: Title, widget: string }
+          - { name: type, label: Type, widget: hidden, default: gallery }
+          - { name: date, label: Date, widget: datetime, format: "YYYY-MM-DDTHH:mm:ssZ" }
+          - { name: url, label: URL, widget: hidden, default: /photos/ }
+          - { name: menu, label: Menu, widget: hidden, default: main }
+          - { name: weight, label: Weight, widget: hidden, default: 2 }
+          - { name: body, label: Introduction, widget: markdown }
