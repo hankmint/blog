@@ -3,7 +3,10 @@
   <section class="rss"><a href="/feed.xml">RSS</a></section>
   {{ with .Site.Params.mastodon }}<section class="mastodon"><a href="{{ . }}" rel="me">Mastodon</a></section>{{ end }}
   <section class="copyright">&copy; {{ now.Format "2006" }} {{ .Site.Title }}</section>
-  <section class="poweredby">Theme based on <a href="https://github.com/slunsford/arabica">Arabica</a> by Sean Lunsford. Published with <a href="https://gohugo.io">Hugo</a> and <a href="https://micro.blog/">Micro.blog</a>.</section>
+  {{/* The Micro.blog credit came from the Arabica theme and is no longer true:
+       this site is self-hosted. The Arabica attribution stays, since the theme
+       is derived from it under the MIT licence. */}}
+  <section class="poweredby">Theme based on <a href="https://github.com/slunsford/arabica">Arabica</a> by Sean Lunsford. Published with <a href="https://gohugo.io">Hugo</a>.</section>
 </footer>
 <!-- custom js -->
 {{ range .Site.Params.customJS }}
