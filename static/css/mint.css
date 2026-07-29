@@ -334,6 +334,15 @@ nav.nav a.nav-current::after { right: 0; }
 .extra-pagination { display: none; }
 
 /* ---------- footer ---------- */
+/* Pin the footer to the bottom of the viewport on short pages. Without this
+   the footer sat wherever the content ended, floating mid-screen with empty
+   paper below it. The lightbox is display:none until opened, so it must not
+   count as a flex child taking up space. */
+html { height: 100%; }
+body { min-height: 100%; display: flex; flex-direction: column; }
+body > main, body > .content { flex: 1 0 auto; }
+.site-footer { flex-shrink: 0; }
+
 .site-footer {
   border-top: 1px solid var(--rule); max-width: var(--wide); margin: 0 auto; padding: 2.2rem 1.5rem 3rem;
   font-family: var(--sans); font-size: .72rem; letter-spacing: .05em; color: var(--muted);

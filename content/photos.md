@@ -7,4 +7,4 @@ type: gallery
 date: 2025-12-19T00:39:49-0500
 url: /photos/
 ---
-Mornings before the city wakes. Photographs, made mostly at first light.
+What the lens catches. An iPhone most days, because it is the one in my pocket, and the Canon when I go looking.
