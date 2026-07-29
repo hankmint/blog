@@ -87,6 +87,28 @@ for u in $(grep -rhoE '^url: "[^"]+"' content | sed 's|^url: "||; s|"$||' | sort
 done
 [ "$BADURL" = "0" ]; check $? "every declared permalink resolves ($BADURL missing)"
 
+# The gallery grid must never serve full-size photographs. Tiles are a few
+# hundred pixels wide; loading 31 originals into them made that page 72 MB.
+python3 - <<'PY' 2>&1
+import pathlib, re, sys
+p = pathlib.Path("public/photos/index.html")
+if not p.is_file():
+    sys.exit(0)
+h = p.read_text()
+srcs = {s.strip('"') for s in re.findall(r'\ssrc=("[^"]+"|[^ >]+)', h)}
+imgs = [s for s in srcs if re.search(r"\.(jpe?g|png)$", s, re.I)]
+full = [s for s in imgs if "-thumb" not in s]
+total = sum(pathlib.Path("public" + s).stat().st_size for s in imgs if pathlib.Path("public" + s).is_file())
+if full:
+    for s in full[:5]:
+        print("    full-size image in the grid:", s, file=sys.stderr)
+    sys.exit(1)
+mb = total / 1024 / 1024
+print(f"    gallery grid: {len(imgs)} thumbnails, {mb:.1f} MB", file=sys.stderr)
+sys.exit(1 if mb > 8 else 0)
+PY
+check $? "the gallery grid serves thumbnails and stays under 8 MB"
+
 # A blob: URL is a temporary in-browser reference that dies with the tab. The
 # editor can save one if an image is still uploading when the post is saved,
 # which looks fine in the editor and is a permanently broken image on the site.

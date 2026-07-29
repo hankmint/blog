@@ -55,11 +55,20 @@
       <figure class="mint-shot{{ if gt $n 1 }} mint-set{{ end }}"{{ if gt $n 1 }} data-count="{{ $n }}"{{ end }}>
         <div class="mint-slides">
           {{ range $i, $src := $set.imgs }}
+            {{/* The grid shows a thumbnail, never the full photograph. A tile is
+                 a few hundred pixels wide; loading 31 full-size images into it
+                 made this page 72 MB. scripts/optimize-images.py writes a
+                 -thumb beside every photograph, and the harness asserts they
+                 all exist. data-full still points at the real image, so the
+                 lightbox opens the good one. */}}
+            {{ $ext := path.Ext $src }}
+            {{ $thumb := printf "%s-thumb%s" (strings.TrimSuffix $ext $src) $ext }}
             <img
               class="mint-slide{{ if eq $i 0 }} is-on{{ end }}"
-              src="{{ $src }}"
+              src="{{ $thumb }}"
               alt="{{ $set.cap }}"
               loading="lazy"
+              decoding="async"
               data-full="{{ $src }}"
               data-cap="{{ $set.cap }}"
               data-href="{{ $set.url }}" />
