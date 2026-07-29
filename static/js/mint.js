@@ -24,6 +24,16 @@
   }
   syncLabel();
 
+
+  /* ---------- Install as an app ----------
+     Registers the service worker so the blog can be added to a phone home
+     screen and survives a dropped connection. Silent if unsupported. */
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("/sw.js").catch(function () {});
+    });
+  }
+
   /* ---------- Gallery carousels ----------
      A post with several photographs gets one tile with arrows and dots rather
      than one tile per photograph, which keeps the grid calm. */

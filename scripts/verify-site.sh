@@ -156,8 +156,14 @@ import pathlib, re, sys
 bad = []
 for page in pathlib.Path("public").rglob("*.html"):
     text = page.read_text(encoding="utf-8", errors="ignore")
-    for href in re.findall(r'href="(https?://[^"]+)"', text):
-        if "nanakofiwrites.com" in href:
+    # Only <a> navigation. <link rel=canonical> and <link rel=alternate> must be
+    # absolute by definition, and og:url likewise, so they are not faults.
+    for tag in re.findall(r"<a\s[^>]*>", text):
+        m = re.search(r'href=("([^"]+)"|([^\s>]+))', tag)
+        if not m:
+            continue
+        href = m.group(2) or m.group(3)
+        if href.startswith("http") and "nanakofiwrites.com" in href:
             bad.append(f"{page.relative_to('public')} links absolutely to {href}")
 for b in bad[:6]:
     print("    ", b, file=sys.stderr)
