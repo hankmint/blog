@@ -9,6 +9,15 @@ pass() { echo "  PASS  $1"; }
 fail() { echo "  FAIL  $1" >&2; FAILED=1; }
 check() { if [ "$1" = "0" ]; then pass "$2"; else fail "$2"; fi }
 
+# A running `hugo server` writes its own output over public/, built with
+# baseURL rewritten to localhost. Checking that build would report a feed full
+# of localhost URLs, or worse, pass while the real production build is broken.
+if pgrep -f "hugo server" >/dev/null 2>&1; then
+  echo "REFUSING TO RUN: a 'hugo server' is running and will contaminate public/." >&2
+  echo "Stop it first (Ctrl-C, or: pkill -f 'hugo server'), then run this again." >&2
+  exit 2
+fi
+
 echo "Building..."
 # --cleanDestinationDir matters. Hugo leaves files behind for content that no
 # longer exists, so a deleted post keeps its page in public/ and gets deployed.
