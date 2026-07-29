@@ -26,7 +26,7 @@
     <div class="mint-featured">
       {{ range . }}
         <article class="feat h-entry">
-          <h2 class="p-name"><a class="u-url" href="{{ .Permalink }}">{{ .Title }}</a></h2>
+          <h2 class="p-name"><a class="u-url" href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
           {{ with .Summary }}<p class="stand p-summary">{{ . | plainify | truncate 190 }}</p>{{ end }}
           <div class="post-meta">
             {{ with .Params.categories }}<span class="dot"></span><span>{{ index . 0 }}</span><span>&middot;</span>{{ end }}
@@ -54,7 +54,7 @@
         <ul class="mint-entries">
         {{ $year = $y }}
       {{ end }}
-      <li><a class="mint-entry h-entry" href="{{ .Permalink }}">
+      <li><a class="mint-entry h-entry" href="{{ .RelPermalink }}">
         <span class="date">{{ .Date.Format "Jan 02" }}</span>
         <span class="ttl p-name">{{ with .Title }}{{ . }}{{ else }}{{ .Plain | plainify | truncate 90 }}{{ end }}</span>
         <span class="topic">{{ with .Params.categories }}<span class="dot"></span>{{ index . 0 }}{{ end }}</span>

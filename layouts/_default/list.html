@@ -19,7 +19,7 @@
         <ul class="mint-entries">
         {{ $year = $y }}
       {{ end }}
-      <li><a class="mint-entry h-entry" href="{{ .Permalink }}">
+      <li><a class="mint-entry h-entry" href="{{ .RelPermalink }}">
         <span class="date">{{ .Date.Format "Jan 02" }}</span>
         <span class="ttl p-name">{{ .Title }}</span>
         <span class="topic">{{ with .Params.categories }}<span class="dot"></span>{{ index . 0 }}{{ end }}</span>

@@ -116,6 +116,26 @@ if [ "$NESTEDFIG" != "0" ]; then grep -rloE '<p>[^<]*<figure' public --include='
 GOLEAK=$(grep -rlE 'map\[[a-zA-Z]+:' public --include='*.html' 2>/dev/null | wc -l | tr -d ' ')
 [ "$GOLEAK" = "0" ]; check $? "no raw Go values rendered into the HTML (found $GOLEAK files)"
 
+# On-site navigation must not be absolute. Absolute hrefs are built from
+# baseURL, so on a Cloudflare preview deployment every link would jump back to
+# the production domain and the preview would be untestable. Feeds and
+# canonical URLs are the exception and stay absolute on purpose.
+python3 - <<'PY' 2>&1
+import pathlib, re, sys
+bad = []
+for page in pathlib.Path("public").rglob("*.html"):
+    text = page.read_text(encoding="utf-8", errors="ignore")
+    for href in re.findall(r'href="(https?://[^"]+)"', text):
+        if "nanakofiwrites.com" in href:
+            bad.append(f"{page.relative_to('public')} links absolutely to {href}")
+for b in bad[:6]:
+    print("    ", b, file=sys.stderr)
+if len(bad) > 6:
+    print(f"    ... and {len(bad)-6} more", file=sys.stderr)
+sys.exit(1 if bad else 0)
+PY
+check $? "on-site links are relative, so preview deployments are testable"
+
 # --- Feeds ---
 #
 # SAFETY CRITICAL and silent when it breaks. /feed.json is registered on the

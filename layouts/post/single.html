@@ -24,7 +24,7 @@
         {{- if reflect.IsMap $author }}{{ $author = $author.name }}{{ end -}}
         <span class="p-author h-card">By {{ $author | default "Nana Kofi" }}</span>
         <span>&middot;</span>
-        <a class="u-url" href="{{ .Permalink }}"><time class="post-date dt-published" datetime="{{ .Date.Format "2006-01-02 15:04:05 -0700" }}">{{ .Date.Format (.Site.Params.dateFormatToUse | default "January 02, 2006") }}</time></a>
+        <a class="u-url" href="{{ .RelPermalink }}"><time class="post-date dt-published" datetime="{{ .Date.Format "2006-01-02 15:04:05 -0700" }}">{{ .Date.Format (.Site.Params.dateFormatToUse | default "January 02, 2006") }}</time></a>
         <span>&middot;</span>
         <span>{{ .ReadingTime }} min read</span>
       </section>
@@ -41,7 +41,7 @@
         {{ range . }}
         {{- $name := . -}}
           {{- with $.Site.GetPage "taxonomy" (printf "tags/%s" $name) | default ($.Site.GetPage "taxonomy" (printf "tags/%s" ($name | urlize))) -}}
-          <a href="{{ .Permalink }}">{{ $name }}</a>
+          <a href="{{ .RelPermalink }}">{{ $name }}</a>
           {{ end -}}
         {{ end }}
       </section>
@@ -50,10 +50,10 @@
       {{ if or $older $newer }}
       <nav class="mint-prevnext" role="navigation">
         {{ with $older }}
-        <a href="{{ .Permalink }}"><span class="lbl">Previous</span><span class="nxt">{{ .Title }}</span></a>
+        <a href="{{ .RelPermalink }}"><span class="lbl">Previous</span><span class="nxt">{{ .Title }}</span></a>
         {{ end }}
         {{ with $newer }}
-        <a class="next-col" href="{{ .Permalink }}"><span class="lbl">Next</span><span class="nxt">{{ .Title }}</span></a>
+        <a class="next-col" href="{{ .RelPermalink }}"><span class="lbl">Next</span><span class="nxt">{{ .Title }}</span></a>
         {{ end }}
       </nav>
       {{ end }}
