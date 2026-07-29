@@ -1,0 +1,22 @@
+// Cloudflare Workers deployment for the MINT blog.
+//
+// This is a purely static site, so there is no Worker script and no "main"
+// entrypoint. Cloudflare serves the built files directly from ./public, which
+// is where `hugo --gc --minify` puts them.
+//
+// The build pipeline configured in the Cloudflare dashboard is:
+//   Build command:  hugo --gc --minify
+//   Deploy command: npx wrangler deploy
+//   Env var:        HUGO_VERSION = 0.163.2   (required; the default Hugo is
+//                   older than the config keys this site uses)
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "blog",
+  "compatibility_date": "2026-07-29",
+  "assets": {
+    "directory": "./public",
+    // Serve Hugo's own 404.html with a real 404 status, rather than treating
+    // every unknown path as a single-page app route.
+    "not_found_handling": "404-page"
+  }
+}
