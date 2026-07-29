@@ -35,9 +35,14 @@ collections:
     label: Posts
     label_singular: Post
     folder: content
-    # Posts live at content/YYYY/MM/DD/slug.md, the structure carried over from
-    # Micro.blog, which keeps every existing permalink working.
-    path: "{{year}}/{{month}}/{{day}}/{{slug}}"
+    # Every post is a Hugo page bundle: content/YYYY/MM/DD/slug/index.md with
+    # its photographs beside it. This is not cosmetic. Saving as slug.md put
+    # uploaded images in a sibling folder that Hugo silently ignores, so the
+    # photographs simply did not publish.
+    path: "{{year}}/{{month}}/{{day}}/{{slug}}/index"
+    # Empty means "next to the entry", which is what makes the bundle work.
+    media_folder: ""
+    public_folder: ""
     create: true
     extension: md
     format: yaml-frontmatter

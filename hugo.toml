@@ -56,7 +56,7 @@ pluralizeListTitles = false
 [params]
   dateFormatToUse = "January 02, 2006"
   logoTitle = '<span class="mark">MINT</span><span class="by">by Nana Kofi</span>'
-  description = "On building, creativity, and life."
+  description = "Technology, creativity and life."
   featuredCount = 2
   archive-paginate = 100
 

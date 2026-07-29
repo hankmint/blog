@@ -79,7 +79,7 @@ def share_card():
     centre(d, (w / 2, h / 2 + 16), "by Nana Kofi", font(SERIF, 40), MUTED, tracking=4)
 
     d.line([(w / 2 - 150, h / 2 + 74), (w / 2 + 150, h / 2 + 74)], fill=ACCENT, width=2)
-    centre(d, (w / 2, h / 2 + 128), "On building, creativity, and life.", font(SERIF, 32), INK)
+    centre(d, (w / 2, h / 2 + 128), "Technology, creativity and life.", font(SERIF, 32), INK)
     centre(d, (w / 2, h - 62), "nanakofiwrites.com", font(SERIF, 26), MUTED, tracking=3)
     return img
 
