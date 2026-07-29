@@ -1,5 +1,5 @@
 baseURL = "https://nanakofiwrites.com/"
-languageCode = "en"
+locale = "en"
 defaultContentLanguage = "en"
 title = "M I N T"
 enableRobotsTXT = true

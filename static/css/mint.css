@@ -232,18 +232,65 @@ nav.nav a.nav-current::after { right: 0; }
 .mint-gal-head p { color: var(--ink-soft); margin: 0; max-width: 34rem; font-style: italic; }
 .mint-gallery { columns: 3 220px; column-gap: 14px; padding-bottom: 4.5rem; }
 .mint-shot {
-  break-inside: avoid; margin: 0 0 14px; width: 100%; cursor: zoom-in; display: block;
+  break-inside: avoid; margin: 0 0 14px; width: 100%; display: block;
   border-radius: 3px; overflow: hidden; position: relative; box-shadow: 0 8px 28px -14px var(--shadow);
   transition: transform .3s, box-shadow .3s; background: var(--paper-2);
 }
 .mint-shot:hover { transform: translateY(-3px); box-shadow: 0 16px 40px -16px var(--shadow); }
-.mint-shot img { width: 100%; display: block; }
+
+/* The first photograph sits in normal flow and gives the tile its height, so the
+   masonry column does not jump when the carousel advances. The rest are laid
+   over it and cropped to fit, the way a phone gallery behaves. */
+.mint-slides { position: relative; display: block; }
+.mint-slide { width: 100%; display: block; cursor: zoom-in; opacity: 0; transition: opacity .3s ease; }
+.mint-slide:not(:first-child) { position: absolute; inset: 0; height: 100%; object-fit: cover; }
+.mint-slide.is-on { opacity: 1; }
+
 .mint-shot .cap {
-  position: absolute; left: 0; right: 0; bottom: 0; padding: 1.4rem .8rem .6rem;
-  background: linear-gradient(transparent, rgba(0,0,0,.55)); color: #fff;
-  font-family: var(--sans); font-size: .68rem; letter-spacing: .06em; opacity: 0; transition: opacity .25s;
+  position: absolute; left: 0; right: 0; bottom: 0; padding: 1.6rem .8rem .6rem;
+  background: linear-gradient(transparent, rgba(0,0,0,.6));
+  font-family: var(--sans); font-size: .68rem; letter-spacing: .06em;
+  opacity: 0; transition: opacity .25s; pointer-events: none;
 }
-.mint-shot:hover .cap { opacity: 1; }
+.mint-shot .cap a { color: #fff; border: 0; pointer-events: auto; }
+.mint-shot:hover .cap, .mint-shot:focus-within .cap { opacity: 1; }
+
+/* ---------- carousel controls ---------- */
+.mint-arrow {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 30px; height: 30px; border-radius: 50%; border: 0; cursor: pointer;
+  background: rgba(255,255,255,.86); color: #1d1a16;
+  font-size: 1.1rem; line-height: 1; display: grid; place-items: center;
+  opacity: 0; transition: opacity .25s, background .2s; z-index: 2;
+  box-shadow: 0 2px 8px rgba(0,0,0,.28);
+}
+.mint-arrow:hover { background: #fff; }
+.mint-prev { left: 8px; }
+.mint-next { right: 8px; }
+.mint-set:hover .mint-arrow, .mint-set:focus-within .mint-arrow { opacity: 1; }
+.mint-arrow:focus-visible { opacity: 1; }
+.mint-arrow[disabled] { display: none; }
+
+.mint-dots {
+  position: absolute; left: 0; right: 0; bottom: 8px; z-index: 2;
+  display: flex; justify-content: center; gap: 5px; pointer-events: auto;
+}
+.mint-dot {
+  width: 6px; height: 6px; padding: 0; border: 0; border-radius: 50%; cursor: pointer;
+  background: rgba(255,255,255,.5); transition: background .2s, transform .2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,.4);
+}
+.mint-dot.is-on { background: #fff; transform: scale(1.25); }
+.mint-dot:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+/* The 1/3 badge, so a set reads as a set before you touch it. */
+.mint-count {
+  position: absolute; top: 8px; right: 8px; z-index: 2;
+  font-family: var(--mono); font-size: .62rem; letter-spacing: .04em;
+  color: #fff; background: rgba(0,0,0,.55); padding: .18rem .4rem; border-radius: 10px;
+  backdrop-filter: blur(2px);
+}
+
 .mint-gallery-empty { color: var(--muted); font-style: italic; }
 
 /* ---------- lightbox ---------- */
@@ -303,3 +350,7 @@ nav.nav a.nav-current::after { right: 0; }
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+/* Link from the lightbox caption back to the post the photograph came from. */
+.mint-lightbox .lb-post { color: #eaddcf; border-bottom: 1px solid rgba(234,221,207,.45); margin-left: .6rem; }
+.mint-lightbox .lb-post:hover { color: #fff; border-bottom-color: #fff; }

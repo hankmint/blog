@@ -24,6 +24,57 @@
   }
   syncLabel();
 
+  /* ---------- Gallery carousels ----------
+     A post with several photographs gets one tile with arrows and dots rather
+     than one tile per photograph, which keeps the grid calm. */
+  Array.prototype.forEach.call(document.querySelectorAll(".mint-set"), function (set) {
+    var slides = set.querySelectorAll(".mint-slide");
+    var dots = set.querySelectorAll(".mint-dot");
+    var counter = set.querySelector(".mint-count");
+    var prev = set.querySelector(".mint-prev");
+    var next = set.querySelector(".mint-next");
+    var at = 0;
+
+    function show(i) {
+      at = (i + slides.length) % slides.length;
+      for (var k = 0; k < slides.length; k++) {
+        slides[k].classList.toggle("is-on", k === at);
+        if (dots[k]) {
+          dots[k].classList.toggle("is-on", k === at);
+          dots[k].setAttribute("aria-selected", k === at ? "true" : "false");
+        }
+      }
+      if (counter) counter.textContent = (at + 1) + "/" + slides.length;
+    }
+
+    if (prev) prev.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); show(at - 1); });
+    if (next) next.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); show(at + 1); });
+    Array.prototype.forEach.call(dots, function (dot, i) {
+      dot.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); show(i); });
+    });
+
+    /* Swipe, because this is mostly read on a phone. */
+    var x0 = null;
+    set.addEventListener("touchstart", function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+    set.addEventListener("touchend", function (e) {
+      if (x0 === null) return;
+      var dx = e.changedTouches[0].clientX - x0;
+      if (Math.abs(dx) > 40) show(at + (dx < 0 ? 1 : -1));
+      x0 = null;
+    }, { passive: true });
+
+    /* Arrow keys when the tile has focus, but not while the lightbox is open. */
+    set.addEventListener("keydown", function (e) {
+      var open = document.getElementById("mint-lightbox");
+      if (open && open.classList.contains("on")) return;
+      if (e.key === "ArrowRight") { e.preventDefault(); show(at + 1); }
+      else if (e.key === "ArrowLeft") { e.preventDefault(); show(at - 1); }
+    });
+
+    set.setAttribute("tabindex", "0");
+    show(0);
+  });
+
   /* ---------- Lightbox ---------- */
   var lb = document.getElementById("mint-lightbox");
   if (!lb) return;
@@ -38,15 +89,28 @@
   var lastFocus = null;
 
   function collect() {
-    shots = Array.prototype.slice.call(document.querySelectorAll(".mint-shot"));
+    // Every photograph in the grid, in reading order, including the ones
+    // currently hidden inside a carousel.
+    shots = Array.prototype.slice.call(document.querySelectorAll(".mint-gallery [data-full]"));
   }
   function open(i) {
     if (!shots.length) return;
     idx = (i + shots.length) % shots.length;
     var el = shots[idx];
-    lbImg.src = el.getAttribute("data-full") || el.getAttribute("href") || "";
+    lbImg.src = el.getAttribute("data-full") || "";
     lbImg.alt = el.getAttribute("data-cap") || "";
-    lbCap.textContent = el.getAttribute("data-cap") || "";
+    var cap = el.getAttribute("data-cap") || "";
+    var href = el.getAttribute("data-href");
+    lbCap.textContent = "";
+    lbCap.appendChild(document.createTextNode(cap));
+    if (href) {
+      var a = document.createElement("a");
+      a.href = href;
+      a.className = "lb-post";
+      a.textContent = "Read the post";
+      lbCap.appendChild(document.createTextNode("  "));
+      lbCap.appendChild(a);
+    }
     lastFocus = document.activeElement;
     lb.classList.add("on");
     lb.setAttribute("aria-hidden", "false");
@@ -62,12 +126,13 @@
 
   collect();
   document.addEventListener("click", function (e) {
-    var shot = e.target.closest ? e.target.closest(".mint-shot") : null;
-    if (shot) {
-      e.preventDefault();
-      if (!shots.length) collect();
-      open(shots.indexOf(shot));
-    }
+    // Only the photograph opens the lightbox. Arrows, dots and the caption link
+    // are controls and must not.
+    if (!e.target.classList || !e.target.classList.contains("mint-slide")) return;
+    e.preventDefault();
+    if (!shots.length) collect();
+    var i = shots.indexOf(e.target);
+    if (i !== -1) open(i);
   });
   btnClose.addEventListener("click", close);
   btnPrev.addEventListener("click", function (e) { e.stopPropagation(); step(-1); });

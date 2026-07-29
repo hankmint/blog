@@ -183,8 +183,12 @@ if grep -qE '>0 (essays|posts)<' public/index.html; then fail "homepage reports 
 # so the gallery and its lightbox did not exist at all.
 [ -f public/photos/index.html ]; check $? "the gallery page is generated at /photos/"
 if [ -f public/photos/index.html ]; then
-  SHOTS=$(grep -c 'class="mint-shot"' public/photos/index.html || true)
-  [ "${SHOTS:-0}" -ge 20 ]; check $? "the gallery shows the photographs (found ${SHOTS:-0})"
+  # Count photographs, not tiles. The gallery shows one tile per post, so a post
+  # with several photographs is a single carousel tile holding all of them.
+  SHOTS=$(grep -o 'data-full="' public/photos/index.html | wc -l | tr -d ' ')
+  [ "${SHOTS:-0}" -ge 28 ]; check $? "the gallery shows every photograph (found ${SHOTS:-0})"
+  TILES=$(grep -o 'class="mint-shot' public/photos/index.html | wc -l | tr -d ' ')
+  [ "${TILES:-0}" -lt "${SHOTS:-0}" ]; check $? "the gallery groups photographs into posts ($TILES tiles for $SHOTS photographs)"
   if grep -q 'mint-gallery-empty' public/photos/index.html; then fail "the gallery says it is empty"; else pass "the gallery is not empty"; fi
 fi
 

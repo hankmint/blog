@@ -7,15 +7,17 @@
     {{ with .Content }}{{ . }}{{ else }}<p>Mornings before the city wakes. Photographs, made mostly at first light.</p>{{ end }}
   </div>
 
-  {{/* Collect images from every post. A photo appears here as soon as it is posted.
-       Prefer front-matter images; only scan the body when there are none. Dedupe by src. */}}
-  {{ $shots := slice }}
-  {{ $seen := slice }}
+  {{/* One tile per post, not one tile per photograph.
+
+       A post with several photographs becomes a carousel inside its tile, with
+       arrows and dots, so the grid stays calm and each post keeps its images
+       together instead of scattering them across the page. */}}
+  {{ $sets := slice }}
   {{ $source := where .Site.RegularPages "Type" "post" }}
   {{ with .Site.GetPage "/categories/photos" }}{{ $source = .Pages }}{{ end }}
   {{ range $source.ByDate.Reverse }}
     {{ $cap := .Title | default (.Date.Format "January 2006") }}
-    {{ $url := .Permalink }}
+    {{ $url := .RelPermalink }}
     {{ $imgs := slice }}
     {{ with .Params.images }}{{ $imgs = . }}
     {{ else }}{{ with .Params.image }}{{ $imgs = slice . }}{{ end }}{{ end }}
@@ -24,30 +26,61 @@
         {{ $imgs = $imgs | append (replaceRE `.*src="([^"]+)".*` "$1" $m) }}
       {{ end }}
     {{ end }}
+
     {{/* Resolve each src against the post it came from. Posts written in the
          editor are page bundles, so their images are relative to the post's own
-         folder. Used verbatim here they would resolve against /photos/ and
-         404. Imported Micro.blog posts already carry site-absolute paths. */}}
+         folder. Used verbatim here they would resolve against /photos/ and 404.
+         Imported Micro.blog posts already carry site-absolute paths. */}}
     {{ $base := .RelPermalink }}
+    {{ $resolved := slice }}
     {{ range $imgs }}
       {{ $src := . }}
       {{ if not (or (hasPrefix $src "/") (hasPrefix $src "http") (hasPrefix $src "data:")) }}
         {{ $src = printf "%s%s" $base $src }}
       {{ end }}
-      {{ if not (in $seen $src) }}
-        {{ $seen = $seen | append $src }}
-        {{ $shots = $shots | append (dict "src" $src "cap" $cap "url" $url) }}
-      {{ end }}
+      {{ if not (in $resolved $src) }}{{ $resolved = $resolved | append $src }}{{ end }}
+    {{ end }}
+
+    {{ with $resolved }}
+      {{ $sets = $sets | append (dict "imgs" . "cap" $cap "url" $url) }}
     {{ end }}
   {{ end }}
 
-  {{ if $shots }}
+  {{ if $sets }}
   <div class="mint-gallery">
-    {{ range $shots }}
-      <a class="mint-shot" href="{{ .url }}" data-full="{{ .src }}" data-cap="{{ .cap }}">
-        <img src="{{ .src }}" alt="{{ .cap }}" loading="lazy" />
-        <span class="cap">{{ .cap }}</span>
-      </a>
+    {{ range $sets }}
+      {{/* Bind the set. Inside the inner range, $ is the page, not this set. */}}
+      {{ $set := . }}
+      {{ $n := len .imgs }}
+      <figure class="mint-shot{{ if gt $n 1 }} mint-set{{ end }}"{{ if gt $n 1 }} data-count="{{ $n }}"{{ end }}>
+        <div class="mint-slides">
+          {{ range $i, $src := $set.imgs }}
+            <img
+              class="mint-slide{{ if eq $i 0 }} is-on{{ end }}"
+              src="{{ $src }}"
+              alt="{{ $set.cap }}"
+              loading="lazy"
+              data-full="{{ $src }}"
+              data-cap="{{ $set.cap }}"
+              data-href="{{ $set.url }}" />
+          {{ end }}
+        </div>
+
+        {{ if gt $n 1 }}
+          <button type="button" class="mint-arrow mint-prev" aria-label="Previous photograph">&#8249;</button>
+          <button type="button" class="mint-arrow mint-next" aria-label="Next photograph">&#8250;</button>
+          <div class="mint-dots" role="tablist" aria-label="Photographs in this post">
+            {{ range $i, $src := $set.imgs }}
+              <button type="button" class="mint-dot{{ if eq $i 0 }} is-on{{ end }}" role="tab"
+                      aria-label="Photograph {{ add $i 1 }} of {{ $n }}"
+                      aria-selected="{{ if eq $i 0 }}true{{ else }}false{{ end }}"></button>
+            {{ end }}
+          </div>
+          <span class="mint-count" aria-hidden="true">1/{{ $n }}</span>
+        {{ end }}
+
+        <figcaption class="cap"><a href="{{ .url }}">{{ .cap }}</a></figcaption>
+      </figure>
     {{ end }}
   </div>
   {{ else }}
