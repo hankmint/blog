@@ -35,14 +35,14 @@ collections:
     label: Posts
     label_singular: Post
     folder: content
-    # Every post is a Hugo page bundle: content/YYYY/MM/DD/slug/index.md with
-    # its photographs beside it. This is not cosmetic. Saving as slug.md put
-    # uploaded images in a sibling folder that Hugo silently ignores, so the
-    # photographs simply did not publish.
+    # Posts are Hugo page bundles: content/YYYY/MM/DD/slug/index.md.
+    #
+    # Photographs deliberately do NOT live inside the bundle. They go to
+    # static/uploads, set globally above. Keeping content/ as pure markdown
+    # matters: the editor fetches the blob of every file inside a collection's
+    # folder, so images in there make it pull megabytes of base64 before it can
+    # show you anything.
     path: "{{year}}/{{month}}/{{day}}/{{slug}}/index"
-    # Empty means "next to the entry", which is what makes the bundle work.
-    media_folder: ""
-    public_folder: ""
     create: true
     extension: md
     format: yaml-frontmatter
