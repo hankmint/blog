@@ -15,9 +15,14 @@
       {{ with .Params.categories }}<div class="post-eyebrow">{{ index . 0 }}</div>{{ end }}
       {{ if .Title }}<h1 class="post-title p-name">{{ .Title }}</h1>{{ end }}
       <section class="post-meta">
-        {{/* author is a map in hugo.toml, the conventional Hugo shape. Printing
-             it directly renders the literal Go map, "map[name:Nana Kofi]". */}}
-        <span class="p-author h-card">By {{ .Site.Params.author.name | default "Nana Kofi" }}</span>
+        {{/* author may be either a map (the conventional Hugo shape, and what
+             hugo.toml uses) or a plain string. Printing a map directly renders
+             the literal Go value, "map[name:Nana Kofi]". Reaching for .name on
+             a string is a hard build failure. Handle both, because a theme
+             should not refuse to build over a reasonable config. */}}
+        {{- $author := .Site.Params.author -}}
+        {{- if reflect.IsMap $author }}{{ $author = $author.name }}{{ end -}}
+        <span class="p-author h-card">By {{ $author | default "Nana Kofi" }}</span>
         <span>&middot;</span>
         <a class="u-url" href="{{ .Permalink }}"><time class="post-date dt-published" datetime="{{ .Date.Format "2006-01-02 15:04:05 -0700" }}">{{ .Date.Format (.Site.Params.dateFormatToUse | default "January 02, 2006") }}</time></a>
         <span>&middot;</span>
