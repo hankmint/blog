@@ -15,12 +15,14 @@
   {{ $n := int (.Site.Params.featuredCount | default 2) }}
   {{ $featured := first $n $titled }}
 
-  <section class="mint-lede{{ if not $featured }} mint-lede-bare{{ end }}">
-    <div class="mint-eyebrow">{{ .Site.Params.description | default "Latest" | safeHTML }}</div>
-    {{/* Only render the featured container when there is something to put in
-         it. An empty flex container still occupies its padding and leaves a
-         conspicuous band of nothing above the index. */}}
-    {{ with $featured }}
+  {{/* The whole lede, eyebrow included, only exists to introduce the featured
+       essays. With no titled post to feature it introduces nothing, and the
+       eyebrow reads as an orphaned line floating above the index. The site
+       name and byline are already in the masthead, and the tagline is still in
+       the hidden h-card there for microformats. */}}
+  {{ with $featured }}
+  <section class="mint-lede">
+    <div class="mint-eyebrow">{{ $.Site.Params.description | default "Latest" | safeHTML }}</div>
     <div class="mint-featured">
       {{ range . }}
         <article class="feat h-entry">
@@ -34,10 +36,10 @@
         </article>
       {{ end }}
     </div>
-    {{ end }}
   </section>
+  {{ end }}
 
-  <section class="mint-index">
+  <section class="mint-index{{ if not $featured }} mint-index-first{{ end }}">
     <div class="mint-index-head">
       <h2>The Index</h2>
       <span class="count">{{ len $posts }} {{ cond (eq (len $posts) 1) "post" "posts" }}</span>

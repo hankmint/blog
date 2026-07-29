@@ -1,5 +1,5 @@
 ---
-title: "Photographs"
+title: "Gallery"
 navigation: true
 menu: main
 weight: 2
