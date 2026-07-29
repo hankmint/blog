@@ -242,9 +242,17 @@ nav.nav a.nav-current::after { right: 0; }
    masonry column does not jump when the carousel advances. The rest are laid
    over it and cropped to fit, the way a phone gallery behaves. */
 .mint-slides { position: relative; display: block; }
-.mint-slide { width: 100%; display: block; cursor: zoom-in; opacity: 0; transition: opacity .3s ease; }
-.mint-slide:not(:first-child) { position: absolute; inset: 0; height: 100%; object-fit: cover; }
-.mint-slide.is-on { opacity: 1; }
+.mint-slide { width: 100%; display: block; cursor: zoom-in; }
+
+/* The first photograph is the base layer. It is never faded out, only covered.
+   Fading it out meant that while the next slide was arriving, or crossfading,
+   the tile's own background showed through and the whole thing went white. */
+.mint-slide:first-child { opacity: 1; }
+.mint-slide:not(:first-child) {
+  position: absolute; inset: 0; height: 100%; object-fit: cover;
+  opacity: 0; transition: opacity .28s ease;
+}
+.mint-slide:not(:first-child).is-on { opacity: 1; }
 
 .mint-shot .cap {
   position: absolute; left: 0; right: 0; bottom: 0; padding: 1.6rem .8rem .6rem;

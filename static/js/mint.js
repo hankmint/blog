@@ -71,6 +71,19 @@
       else if (e.key === "ArrowLeft") { e.preventDefault(); show(at - 1); }
     });
 
+    /* The covering slides are lazy so 30-odd photographs do not all download at
+       once. The moment a tile is touched, hovered or focused, load the rest of
+       its set so advancing never waits on the network. */
+    var warmed = false;
+    function warm() {
+      if (warmed) return;
+      warmed = true;
+      for (var k = 1; k < slides.length; k++) slides[k].loading = "eager";
+    }
+    set.addEventListener("pointerenter", warm);
+    set.addEventListener("focusin", warm);
+    set.addEventListener("touchstart", warm, { passive: true });
+
     set.setAttribute("tabindex", "0");
     show(0);
   });
