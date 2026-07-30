@@ -1,0 +1,18 @@
+{{/* Splits posts into the long ones and the short ones.
+
+     LENGTH decides, not the title. Titling a photograph used to promote it to
+     Posts: "Me and My Dog", nine words and a picture, landed next to a 1,520
+     word essay. A title is just a label someone felt like adding; it says
+     nothing about whether a thing is a piece of writing.
+
+     One threshold, featuredMinWords, used here and by the home page's featured
+     block, so "long enough to be a Post" and "long enough to feature" cannot
+     drift apart. */}}
+{{ $min := int (site.Params.featuredMinWords | default 300) }}
+{{ $all := (where site.RegularPages "Type" "post").ByDate.Reverse }}
+{{ $long := slice }}
+{{ $short := slice }}
+{{ range $all }}
+  {{ if ge .WordCount $min }}{{ $long = $long | append . }}{{ else }}{{ $short = $short | append . }}{{ end }}
+{{ end }}
+{{ return (dict "long" $long "short" $short "all" $all) }}

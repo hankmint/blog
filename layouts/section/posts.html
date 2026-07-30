@@ -4,8 +4,7 @@
      signal the writer gives when a thing is a piece rather than a note. Length
      decides what gets FEATURED on the home page, which is a different question
      and is handled there. */}}
-{{ $all := (where .Site.RegularPages "Type" "post").ByDate.Reverse }}
-{{ $items := where $all "Title" "!=" "" }}
+{{ $items := (partial "split-posts.html" .).long }}
 <main class="content mint-index mint-index-first" role="main">
   <div class="mint-index-head">
     <h1>Posts</h1>

@@ -10,17 +10,10 @@
        Micro.blog posts are untitled micro posts, so filtering the index to
        titled posts as well would leave the homepage reading "0 posts" on the
        day the site goes live. Untitled entries show their opening line. */}}
-  {{ $posts := (where .Site.RegularPages "Type" "post").ByDate.Reverse }}
-  {{ $titled := (where $posts "Title" "!=" "") }}
-  {{/* Featuring on "has a title" alone was too crude. A 51 word test post and a
-       1,520 word essay looked identical to it, so on 2026-07-30 the homepage
-       featured the test and pushed the essay off entirely. A title now says
-       "this is a post, not a note"; LENGTH says "this is the headline piece". */}}
-  {{ $minWords := int (.Site.Params.featuredMinWords | default 300) }}
-  {{ $essays := slice }}
-  {{ range $titled }}{{ if ge .WordCount $minWords }}{{ $essays = $essays | append . }}{{ end }}{{ end }}
+  {{ $split := partial "split-posts.html" . }}
+  {{ $posts := $split.all }}
   {{ $n := int (.Site.Params.featuredCount | default 2) }}
-  {{ $featured := first $n $essays }}
+  {{ $featured := first $n $split.long }}
 
   {{/* The whole lede, eyebrow included, only exists to introduce the featured
        essays. With no titled post to feature it introduces nothing, and the
@@ -52,8 +45,8 @@
          headings on one page, not two pages, because there is one essay so
          far and a separate Posts page would list a single item. */}}
     {{ $rest := complement $featured $posts }}
-    {{ $restPosts := where $rest "Title" "!=" "" }}
-    {{ $restMicro := where $rest "Title" "eq" "" }}
+    {{ $restPosts := complement $featured $split.long }}
+    {{ $restMicro := $split.short }}
     {{/* Posts first, then Notes. Each still grouped by year inside its own
          heading. A group renders nothing when empty, so this reads correctly
          at one essay and will still read correctly at two hundred. */}}

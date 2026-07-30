@@ -17,24 +17,16 @@
       {{ end }}
     </header>
     <section class="e-content post-content">
-      {{/* Floated before the copy so the opening lines wrap around it. Set in
-           front matter rather than in the markdown, so the page body stays
-           prose and the layout decision stays in the layout. */}}
-      {{ with .Params.portrait }}<img class="about-portrait" src="{{ . }}" alt="{{ $.Site.Params.author.name }}" width="132" height="132" />{{ end }}
-      {{ .Content }}
-      {{/* Counted rather than typed, so it cannot go stale. Rate is measured
-           from the first post to today, which is the honest denominator. */}}
-      {{ if .Params.showStats }}
-        {{ $all := (where .Site.RegularPages "Type" "post") }}
-        {{ $n := len $all }}
-        {{ if gt $n 0 }}
-          {{ $first := (index ($all.ByDate) 0).Date }}
-          {{ $weeks := div (div (sub now.Unix $first.Unix) 604800.0) 1.0 }}
-          <p class="about-stats">
-            {{ $n }} {{ cond (eq $n 1) "post" "posts" }} since {{ $first.Format "January 2006" }}{{ if gt $weeks 1.0 }},
-            about {{ lang.FormatNumber 2 (div (float $n) $weeks) }} a week{{ end }}.
-          </p>
-        {{ end }}
+      {{/* A float was the obvious way to sit the portrait beside the text, and
+           it lost to .post-content img, which is more specific. A flex row does
+           not depend on winning a specificity argument. */}}
+      {{ with .Params.portrait }}
+        <div class="about-row">
+          <img class="about-portrait" src="{{ . }}" alt="{{ $.Site.Params.author.name }}" width="132" height="132" />
+          <div class="about-copy">{{ $.Content }}</div>
+        </div>
+      {{ else }}
+        {{ .Content }}
       {{ end }}
     </section>
   </article>

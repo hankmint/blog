@@ -453,18 +453,24 @@ body > main, body > .content { flex: 1 0 auto; }
   text-transform: uppercase; color: var(--accent); margin: .6rem 0 0;
 }
 
-/* About: the portrait sits small and square beside the text rather than as a
-   full-width band. Floated so the opening lines wrap around it. */
-.about-portrait {
-  float: right; width: 132px; height: 132px; aspect-ratio: 1; object-fit: cover;
-  border-radius: 6px; margin: 0 0 1.1rem 1.4rem; shape-outside: inset(0 round 6px);
+/* About: portrait and copy side by side.
+   Was a float, which lost to .post-content img on specificity and left the
+   picture sitting alone above the text. A flex row does not have that argument.
+   .post-content img sets width:100%, so the portrait needs flex-shrink:0 and an
+   explicit width that beats it. */
+.about-row { display: flex; align-items: flex-start; gap: 1.5rem; }
+.about-copy { flex: 1; min-width: 0; }
+.about-copy > p:first-child { margin-top: 0; }
+.post-content .about-portrait {
+  flex: 0 0 auto; width: 132px; height: 132px; aspect-ratio: 1; object-fit: cover;
+  border-radius: 6px; margin: 0;
   box-shadow: 0 12px 34px -16px var(--shadow);
 }
 /* On a phone a 132px float leaves a column of text three words wide. Stack it. */
 @media (max-width: 640px) {
-  .about-portrait {
-    float: none; display: block; width: 108px; height: 108px; margin: 0 0 1.2rem;
-  }
+  /* 132px beside text on a 360px screen leaves a column three words wide. */
+  .about-row { flex-direction: column; gap: 1.1rem; }
+  .post-content .about-portrait { width: 108px; height: 108px; }
   .mint-index-head { flex-wrap: wrap; gap: .3rem .7rem; }
   .page-tagline { letter-spacing: .14em; }
   /* Absolutely positioned from the left edge, it ran off the side of a narrow

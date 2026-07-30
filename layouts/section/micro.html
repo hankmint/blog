@@ -2,8 +2,7 @@
 {{ define "main" }}
 {{/* Short things. Untitled by definition, so each entry shows its opening line
      in place of a headline, which is what the home page does too. */}}
-{{ $all := (where .Site.RegularPages "Type" "post").ByDate.Reverse }}
-{{ $items := where $all "Title" "eq" "" }}
+{{ $items := (partial "split-posts.html" .).short }}
 <main class="content mint-index mint-index-first" role="main">
   <div class="mint-index-head">
     <h1>Micro</h1>
