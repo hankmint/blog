@@ -1,0 +1,103 @@
+{{- /* Turns a pasted music or video link into a player.
+
+         Paste the link on its own line and nothing else:
+
+           https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT
+
+         and it becomes an embedded player. YouTube, Spotify and Apple Music.
+         Everything else is left exactly as it was.
+
+       Deliberately a render hook rather than a shortcode, matching
+       render-image.html: this is plain Markdown, so any editor can produce it,
+       it survives changing editors, and it does not litter posts with template
+       syntax. Paste the link, done.
+
+       Only a BARE link is embedded, meaning the link text is the URL itself.
+       Writing [this song](https://open.spotify.com/...) inside a sentence keeps
+       it an ordinary inline link, because that is plainly what was meant.
+
+       TWO CONSTRAINTS THIS FILE IS BUILT AROUND. Both are easy to break.
+
+       1. Everything emitted here must be valid INSIDE A PARAGRAPH.
+          hugo.toml sets wrapStandAloneImageWithinParagraph = false for images,
+          but Goldmark has no such setting for links, so a link alone on a line
+          still becomes <p><a>...</a></p>. A <figure> or <div> in there is
+          invalid HTML that browsers tear apart, leaving stray empty paragraphs.
+          <span>, <iframe> and <a> are all phrasing content and are safe.
+          Use them. Do not "tidy" this into a <figure>.
+
+       2. The fallback link is not decoration. SAFETY CRITICAL, see
+          layouts/index.json. .Content goes into content_html in /feed.json,
+          which drives cross-posting to Bluesky, Mastodon, Threads, LinkedIn and
+          the rest. Those networks strip <iframe>. Without the anchor beside it
+          the post would cross-post with the song silently missing entirely.
+          The anchor is hidden on the site with CSS (.embed-fallback in
+          mint.css); feeds carry no CSS, so off-site it is what people see. */ -}}
+
+{{- $dest := .Destination -}}
+{{- $u := urls.Parse $dest -}}
+{{- $host := replace (lower $u.Host) "www." "" -}}
+{{- $path := strings.TrimPrefix "/" $u.Path -}}
+{{- $parts := split $path "/" -}}
+
+{{- /* Bare link only: the visible text is the URL. */ -}}
+{{- $bare := eq (trim .PlainText " ") (trim $dest " ") -}}
+
+{{- $src := "" -}}
+{{- $label := "" -}}
+{{- $kind := "" -}}
+
+{{- if $bare -}}
+
+  {{- /* ---- YouTube ---- youtu.be/ID, /watch?v=ID, /shorts/ID, /embed/ID */ -}}
+  {{- if eq $host "youtu.be" -}}
+    {{- with index $parts 0 -}}
+      {{- $src = printf "https://www.youtube-nocookie.com/embed/%s" . -}}
+    {{- end -}}
+  {{- else if or (eq $host "youtube.com") (eq $host "m.youtube.com") -}}
+    {{- $v := $u.Query.Get "v" -}}
+    {{- if $v -}}
+      {{- $src = printf "https://www.youtube-nocookie.com/embed/%s" $v -}}
+    {{- else if and (ge (len $parts) 2) (in (slice "shorts" "embed" "live") (index $parts 0)) -}}
+      {{- $src = printf "https://www.youtube-nocookie.com/embed/%s" (index $parts 1) -}}
+    {{- end -}}
+  {{- end -}}
+  {{- if $src -}}
+    {{- $kind = "video" -}}
+    {{- $label = "Watch on YouTube" -}}
+  {{- end -}}
+
+  {{- /* ---- Spotify ---- open.spotify.com/<type>/<id>, optional /intl-xx/ */ -}}
+  {{- if and (not $src) (eq $host "open.spotify.com") -}}
+    {{- $seg := $parts -}}
+    {{- if and (gt (len $seg) 0) (hasPrefix (index $seg 0) "intl-") -}}
+      {{- $seg = after 1 $seg -}}
+    {{- end -}}
+    {{- if ge (len $seg) 2 -}}
+      {{- $type := index $seg 0 -}}
+      {{- $id := index $seg 1 -}}
+      {{- if in (slice "track" "album" "playlist" "artist" "episode" "show") $type -}}
+        {{- $src = printf "https://open.spotify.com/embed/%s/%s" $type $id -}}
+        {{- $kind = cond (in (slice "track" "episode") $type) "audio-compact" "audio" -}}
+        {{- $label = "Listen on Spotify" -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+
+  {{- /* ---- Apple Music ---- music.apple.com/... becomes embed.music.apple.com/... */ -}}
+  {{- if and (not $src) (or (eq $host "music.apple.com") (eq $host "embed.music.apple.com")) -}}
+    {{- $q := "" -}}
+    {{- with $u.RawQuery }}{{ $q = printf "?%s" . }}{{ end -}}
+    {{- $src = printf "https://embed.music.apple.com/%s%s" $path $q -}}
+    {{- /* A single song is the ?i= form and gets the short player. */ -}}
+    {{- $kind = cond (ne ($u.Query.Get "i") "") "audio-compact" "audio" -}}
+    {{- $label = "Listen on Apple Music" -}}
+  {{- end -}}
+
+{{- end -}}
+
+{{- if $src -}}
+<span class="embed embed-{{ $kind }}"><iframe src="{{ $src | safeURL }}" title="{{ $label }}" loading="lazy" frameborder="0" allowfullscreen allow="autoplay *; clipboard-write; encrypted-media *; fullscreen *; picture-in-picture; web-share"></iframe><a class="embed-fallback" href="{{ $dest | safeURL }}">{{ $label }}</a></span>
+{{- else -}}
+<a href="{{ $dest | safeURL }}"{{ with .Title }} title="{{ . }}"{{ end }}{{ if strings.HasPrefix $dest "http" }} rel="noopener"{{ end }}>{{ .Text | safeHTML }}</a>
+{{- end -}}

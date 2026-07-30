@@ -16,7 +16,13 @@
          text everywhere it was posted: no picture, no title, no description.
          A post with photographs shares its own first photograph; everything
          else falls back to the MINT card. */}}
-    {{- $desc := .Description | default .Summary | plainify | truncate 180 -}}
+    {{/* Drop the hidden fallback links that _markup/render-link.html puts
+         beside each embedded player. They exist for /feed.json, where iframes
+         get stripped, but they are invisible on the page and plainify cannot
+         tell. Left in, a post that opens with a song shared as "Listen on
+         Spotify Watch on YouTube" instead of its own first sentence. */}}
+    {{- $sum := replaceRE `(?s)<a class="embed-fallback".*?</a>` "" .Summary -}}
+    {{- $desc := .Description | default $sum | plainify | strings.TrimSpace | truncate 180 -}}
     {{- if not $desc }}{{ $desc = .Site.Params.description }}{{ end -}}
     {{- $title := cond .IsHome .Site.Title (printf "%s - %s" .Title .Site.Title) -}}
     {{- if and (not .IsHome) (not .Title) }}{{ $title = .Site.Title }}{{ end -}}
