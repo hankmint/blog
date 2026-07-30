@@ -38,19 +38,33 @@
     <footer class="post-footer">
       {{/* Share. An untitled note has no headline to carry, so it shares its
            opening line instead, which is what the index already shows. */}}
+      {{/* One small icon, and a copy link behind it. Nothing else.
+
+           The row used to offer X and LinkedIn. LinkedIn's share-offsite URL
+           requires a session, so a logged-in reader was bounced to their own
+           feed and a logged-out one to a sign-in wall. Neither shares the post.
+           Hard-coding two networks also dates the page and pushes the reader
+           somewhere else; a link they can paste anywhere does not.
+
+           Where the browser has a real share sheet, the button opens that
+           instead, which reaches every app the reader actually uses. */}}
       {{ $share := .Title | default (.Plain | truncate 110) }}
       <section class="mint-share" aria-label="Share this post">
-        <span class="lbl">Share</span>
-        <a class="mint-share-x" rel="noopener nofollow" target="_blank"
-           href="https://x.com/intent/post?text={{ $share | urlquery }}&amp;url={{ .Permalink | urlquery }}">X</a>
-        <a class="mint-share-in" rel="noopener nofollow" target="_blank"
-           href="https://www.linkedin.com/sharing/share-offsite/?url={{ .Permalink | urlquery }}">LinkedIn</a>
-        <button type="button" class="mint-share-copy" data-url="{{ .Permalink }}">Copy link</button>
-        {{/* Shown only where the browser has a share sheet, which is where it
-             beats the hard-coded two. Not called "Share", because the row is
-             already labelled that. */}}
-        <button type="button" class="mint-share-native" hidden
-                data-title="{{ $share }}" data-url="{{ .Permalink }}">More&hellip;</button>
+        <button type="button" class="mint-share-btn" aria-expanded="false"
+                aria-label="Share this post" title="Share"
+                data-url="{{ .Permalink }}" data-title="{{ $share }}">
+          <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false"
+               fill="none" stroke="currentColor" stroke-width="1.7"
+               stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+            <path d="M8.6 10.6l6.8-3.9M8.6 13.4l6.8 3.9"/>
+          </svg>
+        </button>
+        <div class="mint-share-pop" hidden>
+          <input class="mint-share-url" type="text" readonly value="{{ .Permalink }}"
+                 aria-label="Link to this post" />
+          <button type="button" class="mint-share-copy" data-url="{{ .Permalink }}">Copy</button>
+        </div>
       </section>
 
       {{ with .Params.tags -}}

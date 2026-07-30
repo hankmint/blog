@@ -23,7 +23,7 @@ import pathlib
 import sys
 
 try:
-    from PIL import Image
+    from PIL import Image, ImageOps
 except ImportError:
     sys.exit("FAIL: Pillow is required.  pip3 install Pillow")
 
@@ -68,6 +68,13 @@ def main() -> int:
         before += size
 
         with Image.open(src) as im:
+            # A phone writes the photograph in sensor orientation and records
+            # "rotate this" in EXIF; the browser obeys the tag. Saving through
+            # Pillow drops EXIF, so the tag goes and the picture is suddenly on
+            # its side. That is exactly what happened to the sunrise on
+            # 2026-07-30. exif_transpose bakes the rotation into the pixels, so
+            # the image is upright with or without metadata.
+            im = ImageOps.exif_transpose(im)
             im.load()
 
             # 1. The full-size image the reader opens.

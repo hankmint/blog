@@ -11,7 +11,11 @@
 			<a class="u-url p-name" href="{{ "/" | relLangURL }}">{{ $brand | safeHTML }}</a>
 		</p>
 		{{ end }}
-		<h2 class="p-note blog-description">{{ .Site.Params.description | safeHTML }}</h2>
+		{{/* The tagline moved to /about/, where a line about the writer belongs.
+		     On every page it was furniture; on one page it is an introduction.
+		     Kept here as a visually-hidden p-note so the h-card microformat is
+		     still complete for anything parsing the masthead. */}}
+		<h2 class="p-note blog-description visually-hidden">{{ .Site.Params.description | safeHTML }}</h2>
 
 		<nav class="nav" role="navigation">
 		{{ $currentPage := . }}
