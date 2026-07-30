@@ -20,7 +20,21 @@
 	"feed_url": "{{ .Site.BaseURL }}feed.json",
 	"description": {{ .Site.Params.description | plainify | jsonify }},
 	"items": [
-		{{- $list := first 25 (where .Site.RegularPages "Type" "post").ByDate.Reverse -}}
+		{{- /* OPT-IN ONLY. A post reaches this feed, and therefore Bluesky,
+		       Mastodon, LinkedIn and the rest, only when it was deliberately
+		       marked "Also send to social networks" in the editor. Nothing is
+		       broadcast by simply being published.
+
+		       Human RSS readers are not affected: layouts/_default/rss.xml
+		       still carries every published post at /feed.xml. This gates the
+		       relay, not the blog.
+
+		       Posts written before this switch existed have no crosspost field
+		       and so are absent here. That is correct and harmless: they were
+		       already relayed once, and Micro.blog dedupes on the guid, so
+		       their absence cannot cause a re-post. */ -}}
+		{{- $posts := where .Site.RegularPages "Type" "post" -}}
+		{{- $list := first 25 (where $posts "Params.crosspost" true).ByDate.Reverse -}}
 		{{- $len := (len $list) -}}
 		{{ range $index, $value := $list }}
 			{
