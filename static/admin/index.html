@@ -24,6 +24,32 @@
     </script>
   </head>
   <body>
+    <!-- Signing in opens a popup and reads the reply from window.opener. An
+         installed PWA on iOS blocks that and keeps its own storage besides, so
+         the flow hangs with no explanation. Say so plainly rather than let it
+         spin, and point at the way that does work. -->
+    <script>
+      (function () {
+        var standalone =
+          window.navigator.standalone === true ||
+          (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
+        if (!standalone) return;
+        document.addEventListener("DOMContentLoaded", function () {
+          var n = document.createElement("div");
+          n.setAttribute("role", "alert");
+          n.style.cssText =
+            "font:15px/1.5 -apple-system,BlinkMacSystemFont,system-ui,sans-serif;" +
+            "background:#7A2E28;color:#FBF8F3;padding:14px 16px;margin:0;";
+          n.innerHTML =
+            "<strong>Open this in your browser to sign in.</strong><br>" +
+            "The installed app cannot complete the GitHub sign-in: it blocks the " +
+            "popup and keeps separate storage. Tap Share, then <em>Open in Safari</em>, " +
+            "or use <em>Sign In Using Access Token</em> below, which needs no popup.";
+          document.body.insertBefore(n, document.body.firstChild);
+        });
+      })();
+    </script>
+
     <!-- Sveltia CMS, vendored rather than loaded from a CDN so the editor works
          offline and the version is pinned with the repo. See static/admin/VERSION. -->
     <script src="/admin/sveltia-cms.js"></script>
