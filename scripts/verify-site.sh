@@ -152,7 +152,7 @@ GOLEAK=$(grep -rlE 'map\[[a-zA-Z]+:' public --include='*.html' 2>/dev/null | wc 
 # the production domain and the preview would be untestable. Feeds and
 # canonical URLs are the exception and stay absolute on purpose.
 python3 - <<'PY' 2>&1
-import pathlib, re, sys
+import html, pathlib, re, sys, urllib.parse
 bad = []
 for page in pathlib.Path("public").rglob("*.html"):
     text = page.read_text(encoding="utf-8", errors="ignore")
@@ -163,7 +163,16 @@ for page in pathlib.Path("public").rglob("*.html"):
         if not m:
             continue
         href = m.group(2) or m.group(3)
-        if href.startswith("http") and "nanakofiwrites.com" in href:
+        if not href.startswith("http"):
+            continue
+        # Check the HOST, not the whole string. A share link to x.com or
+        # linkedin.com legitimately carries the post's absolute URL as a query
+        # parameter, and a substring match flags every one of them.
+        try:
+            host = urllib.parse.urlparse(html.unescape(href)).netloc.lower()
+        except Exception:
+            continue
+        if host in ("nanakofiwrites.com", "www.nanakofiwrites.com"):
             bad.append(f"{page.relative_to('public')} links absolutely to {href}")
 for b in bad[:6]:
     print("    ", b, file=sys.stderr)

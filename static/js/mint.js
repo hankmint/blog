@@ -45,6 +45,49 @@
     }
   }
 
+
+  /* ---------- Sharing ----------
+     The native sheet is the best option where it exists, because it offers
+     every app on the device rather than the two we happened to hard-code. It
+     only appears when the browser actually supports it. */
+  var nativeBtn = document.querySelector(".mint-share-native");
+  if (nativeBtn && navigator.share) {
+    nativeBtn.hidden = false;
+    nativeBtn.addEventListener("click", function () {
+      navigator
+        .share({ title: nativeBtn.dataset.title, url: nativeBtn.dataset.url })
+        .catch(function () {});
+    });
+  }
+
+  var copyBtn = document.querySelector(".mint-share-copy");
+  if (copyBtn) {
+    copyBtn.addEventListener("click", function () {
+      var done = function () {
+        var was = copyBtn.textContent;
+        copyBtn.textContent = "Copied";
+        copyBtn.classList.add("copied");
+        setTimeout(function () {
+          copyBtn.textContent = was;
+          copyBtn.classList.remove("copied");
+        }, 1600);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(copyBtn.dataset.url).then(done, function () {});
+      } else {
+        // Older Safari, and any page not served over https.
+        var t = document.createElement("textarea");
+        t.value = copyBtn.dataset.url;
+        t.setAttribute("readonly", "");
+        t.style.cssText = "position:absolute;left:-9999px";
+        document.body.appendChild(t);
+        t.select();
+        try { document.execCommand("copy"); done(); } catch (e) {}
+        document.body.removeChild(t);
+      }
+    });
+  }
+
   /* ---------- Gallery carousels ----------
      A post with several photographs gets one tile with arrows and dots rather
      than one tile per photograph, which keeps the grid calm. */

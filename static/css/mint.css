@@ -371,3 +371,19 @@ body > main, body > .content { flex: 1 0 auto; }
 /* Link from the lightbox caption back to the post the photograph came from. */
 .mint-lightbox .lb-post { color: #eaddcf; border-bottom: 1px solid rgba(234,221,207,.45); margin-left: .6rem; }
 .mint-lightbox .lb-post:hover { color: #fff; border-bottom-color: #fff; }
+
+/* ---------- share ---------- */
+.mint-share {
+  display: flex; align-items: center; gap: .9rem; flex-wrap: wrap;
+  padding-bottom: 1.2rem; margin-bottom: 1.2rem; border-bottom: 1px solid var(--rule);
+  font-family: var(--sans); font-size: .68rem; letter-spacing: .12em; text-transform: uppercase;
+}
+.mint-share .lbl { color: var(--muted); }
+.mint-share a, .mint-share button {
+  color: var(--muted); background: none; border: 0; border-bottom: 1px solid transparent;
+  padding: 0; cursor: pointer; font: inherit; letter-spacing: inherit; text-transform: inherit;
+  transition: color .2s, border-color .2s;
+}
+.mint-share a:hover, .mint-share button:hover { color: var(--accent); border-bottom-color: var(--accent); }
+.mint-share button:focus-visible, .mint-share a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.mint-share .copied { color: var(--accent); }

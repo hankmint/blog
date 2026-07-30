@@ -36,6 +36,20 @@
     </section>
 
     <footer class="post-footer">
+      {{/* Share. An untitled note has no headline to carry, so it shares its
+           opening line instead, which is what the index already shows. */}}
+      {{ $share := .Title | default (.Plain | truncate 110) }}
+      <section class="mint-share" aria-label="Share this post">
+        <span class="lbl">Share</span>
+        <button type="button" class="mint-share-native" hidden
+                data-title="{{ $share }}" data-url="{{ .Permalink }}">Share</button>
+        <a class="mint-share-x" rel="noopener nofollow" target="_blank"
+           href="https://x.com/intent/post?text={{ $share | urlquery }}&amp;url={{ .Permalink | urlquery }}">X</a>
+        <a class="mint-share-in" rel="noopener nofollow" target="_blank"
+           href="https://www.linkedin.com/sharing/share-offsite/?url={{ .Permalink | urlquery }}">LinkedIn</a>
+        <button type="button" class="mint-share-copy" data-url="{{ .Permalink }}">Copy link</button>
+      </section>
+
       {{ with .Params.tags -}}
       <section class="tags">
         {{ range . }}

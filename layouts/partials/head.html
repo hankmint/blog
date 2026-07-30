@@ -39,11 +39,25 @@
     <meta property="og:description" content="{{ $desc }}" />
     <meta property="og:url" content="{{ .Permalink }}" />
     <meta property="og:image" content="{{ $img | absURL }}" />
+    <meta property="og:image:alt" content="{{ $title }}" />
+    {{- if eq $img "/share-card.png" }}
+    {{/* LinkedIn will not render a large card unless it is confident about the
+         dimensions, and it wants at least 1200x627. Only declare these for the
+         card, whose size we actually know; a post's own photograph varies. */}}
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/png" />
+    {{- end }}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="{{ $title }}" />
     <meta name="twitter:description" content="{{ $desc }}" />
     <meta name="twitter:image" content="{{ $img | absURL }}" />
+    <meta name="twitter:image:alt" content="{{ $title }}" />
     {{ with .Params.date }}<meta property="article:published_time" content="{{ .Format "2006-01-02T15:04:05Z07:00" }}" />{{ end }}
+    {{- if .IsPage }}
+    <meta property="article:author" content="{{ .Site.Params.author.name | default "Nana Kofi" }}" />
+    {{- with .Params.categories }}<meta property="article:section" content="{{ index . 0 }}" />{{ end }}
+    {{- end }}
     <link rel="canonical" href="{{ .Permalink }}" />
 
     {{/* Icons and installability. */}}
