@@ -131,8 +131,11 @@ collections:
         multiple: true
         options: [Building, Creative, Life]
         hint: Optional. Rooms return to the navigation once there is writing in them.
+      # Labelled "Write", not "Post". Sveltia's only button says Save, so the
+      # word Post sitting above the text box read like the missing publish
+      # button and was mistaken for one.
       - name: body
-        label: Post
+        label: Write
         widget: markdown
         hint: "Drag a photograph in. To caption it, use the image title: ![alt](/uploads/2026/photo.jpg \"your caption\")"
 
