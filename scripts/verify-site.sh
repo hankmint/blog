@@ -203,19 +203,47 @@ if not str(d.get("version", "")).startswith("https://jsonfeed.org/version/"):
 if not str(d.get("feed_url", "")).endswith("/feed.json"):
     problems.append(f"feed_url must end in /feed.json, got {d.get('feed_url')!r}")
 items = d.get("items", [])
-if len(items) < 18:
-    problems.append(f"expected at least the 18 imported posts, got {len(items)}")
+
+# This feed is OPT-IN. It used to carry every post, and that was the bug: saving
+# in the editor broadcast to twelve networks with no way to hold a draft. It now
+# carries exactly the posts marked "Also send to social networks", so the
+# assertion is no longer "everything is here" but "nothing is here that did not
+# ask to be". An empty feed is a correct and expected state.
+import glob, re, pathlib
+optin = set()
+for f in glob.glob("content/**/*.md", recursive=True):
+    head = pathlib.Path(f).read_text(encoding="utf-8", errors="replace").split("---")[1:2]
+    if head and re.search(r"^crosspost:\s*true\s*$", head[0], re.M):
+        optin.add(re.search(r"^title:\s*(.+?)\s*$", head[0], re.M).group(1).strip('"\'')
+                  if re.search(r"^title:", head[0], re.M) else f)
+if len(items) != len(optin):
+    problems.append(
+        f"feed.json should carry exactly the crosspost:true posts: "
+        f"{len(optin)} marked in content/, {len(items)} in the feed")
 for i, it in enumerate(items):
     for key in ("id", "url", "date_published", "content_html"):
         if not it.get(key):
             problems.append(f"item {i} missing {key}")
     if "micro.blog" in str(it.get("url", "")):
         problems.append(f"item {i} url still points at micro.blog")
+    # An embedded player is stripped of its iframe by Bluesky, Mastodon and
+    # LinkedIn. The fallback link beside it is what survives; without it the
+    # song arrives silently missing. See _markup/render-link.html.
+    if "<iframe" in str(it.get("content_html", "")) and "embed-fallback" not in str(it.get("content_html", "")):
+        problems.append(f"item {i} has an embedded player with no fallback link")
 for p in problems[:8]:
     print("    ", p, file=sys.stderr)
 sys.exit(1 if problems else 0)
 PY
-  check $? "feed.json is a valid JSON Feed with every post in it"
+  check $? "feed.json carries exactly the posts marked for cross-posting"
+fi
+
+# The relay is opt-in; the human feed is not. /feed.xml must still carry
+# everything, or gating the cross-post would have quietly gutted RSS too.
+if [ -f public/feed.xml ]; then
+  n=$(grep -o '<item>' public/feed.xml | wc -l | tr -d ' ')
+  [ "$n" -ge 18 ]
+  check $? "feed.xml still carries every published post (found $n)"
 fi
 
 if [ -f public/feed.xml ]; then

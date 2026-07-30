@@ -63,6 +63,20 @@
                  lightbox opens the good one. */}}
             {{ $ext := path.Ext $src }}
             {{ $thumb := printf "%s-thumb%s" (strings.TrimSuffix $ext $src) $ext }}
+            {{/* A photograph added through the editor arrives with no -thumb:
+                 the editor commits straight to GitHub and nothing runs
+                 scripts/optimize-images.py on the way. Pointing at a thumbnail
+                 that was never written is what put a broken tile at the top of
+                 this page on 2026-07-30.
+
+                 Fall back to the full photograph, which is always there. The
+                 tile is then heavier than it should be until the script runs,
+                 but it is a photograph rather than a broken icon.
+                 scripts/verify-site.sh still reports the missing thumbnails,
+                 so this hides nothing. */}}
+            {{ if hasPrefix $src "/" }}
+              {{ if not (fileExists (printf "static%s" $thumb)) }}{{ $thumb = $src }}{{ end }}
+            {{ end }}
             <img
               class="mint-slide{{ if eq $i 0 }} is-on{{ end }}"
               src="{{ $thumb }}"
