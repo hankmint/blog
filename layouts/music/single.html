@@ -1,0 +1,25 @@
+{{ define "body_class" }}post-template{{ end }}
+{{ define "main" }}
+<main class="content" role="main">
+  <article class="h-entry post">
+    <header class="post-header">
+      <h1 class="p-name post-title">{{ .Title }}</h1>
+      {{ with .Params.artist }}<p class="page-tagline">{{ . }}</p>{{ end }}
+      <div class="post-meta">
+        <time class="dt-published" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format (.Site.Params.dateFormatToUse | default "January 02, 2006") }}</time>
+      </div>
+    </header>
+    <section class="e-content post-content">
+      {{ .Content }}
+      {{/* The link is written as a bare URL on its own line, which is exactly
+           what _markup/render-link.html turns into a player. Same code path as
+           pasting a song into a post, so there is one embed implementation and
+           not two. */}}
+      {{ with .Params.link }}{{ printf "\n\n%s\n" . | $.RenderString (dict "display" "block") }}{{ end }}
+    </section>
+    <footer class="post-footer">
+      <a href="/music/">&larr; All music</a>
+    </footer>
+  </article>
+</main>
+{{ end }}

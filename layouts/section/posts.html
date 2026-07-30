@@ -1,0 +1,17 @@
+{{ define "body_class" }}list-template{{ end }}
+{{ define "main" }}
+{{/* Longer pieces. A post earns a place here by having a title: that is the
+     signal the writer gives when a thing is a piece rather than a note. Length
+     decides what gets FEATURED on the home page, which is a different question
+     and is handled there. */}}
+{{ $all := (where .Site.RegularPages "Type" "post").ByDate.Reverse }}
+{{ $items := where $all "Title" "!=" "" }}
+<main class="content mint-index mint-index-first" role="main">
+  <div class="mint-index-head">
+    <h1>Posts</h1>
+    <span class="count">{{ len $items }}</span>
+  </div>
+  {{ with .Content }}<div class="mint-section-intro">{{ . }}</div>{{ end }}
+  {{ partial "entry-list.html" (dict "items" $items) }}
+</main>
+{{ end }}

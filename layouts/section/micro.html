@@ -1,0 +1,15 @@
+{{ define "body_class" }}list-template{{ end }}
+{{ define "main" }}
+{{/* Short things. Untitled by definition, so each entry shows its opening line
+     in place of a headline, which is what the home page does too. */}}
+{{ $all := (where .Site.RegularPages "Type" "post").ByDate.Reverse }}
+{{ $items := where $all "Title" "eq" "" }}
+<main class="content mint-index mint-index-first" role="main">
+  <div class="mint-index-head">
+    <h1>Micro</h1>
+    <span class="count">{{ len $items }}</span>
+  </div>
+  {{ with .Content }}<div class="mint-section-intro">{{ . }}</div>{{ end }}
+  {{ partial "entry-list.html" (dict "items" $items) }}
+</main>
+{{ end }}

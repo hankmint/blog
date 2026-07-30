@@ -83,7 +83,7 @@ collections:
         label: Title
         widget: string
         required: false
-        hint: Optional. Leave empty for a short note; give it a title and it becomes a featured essay on the homepage.
+        hint: "Leave empty and it is a Micro post: short, usually a photograph. Give it a title and it becomes a Post. Past 300 words a Post is also featured on the front page."
       # THE TWO SWITCHES BELOW ARE THE PUBLISH CONTROLS. Read this before
       # changing either default.
       #
@@ -162,3 +162,45 @@ collections:
           - { name: menu, label: Menu, widget: hidden, default: main }
           - { name: weight, label: Weight, widget: hidden, default: 2 }
           - { name: body, label: Introduction, widget: markdown }
+
+  # Music. One entry per song, each getting its own small page with the player
+  # on it, and all of them listed at /music/.
+  #
+  # Deliberately a separate collection rather than a kind of post: a song is not
+  # a note, it should not sit in the Micro stream, and it wants fields a post
+  # does not have. Modelled on how harper.blog does it, which is the only part
+  # of that site that works from a standing start rather than needing years of
+  # archive behind it.
+  - name: music
+    label: Music
+    label_singular: Song
+    folder: content/music
+    path: "{{year}}-{{month}}-{{day}}-{{slug}}/index"
+    create: true
+    extension: md
+    format: yaml-frontmatter
+    sortable_fields: [date, title]
+    fields:
+      - name: title
+        label: Song
+        widget: string
+      - name: artist
+        label: Artist
+        widget: string
+      - name: date
+        label: Date
+        widget: datetime
+        format: "YYYY-MM-DDTHH:mm:ssZ"
+      - name: type
+        label: Type
+        widget: hidden
+        default: music
+      - name: link
+        label: Link
+        widget: string
+        hint: "Paste the Spotify, Apple Music or YouTube link. The player is built from it."
+      - name: body
+        label: Note
+        widget: markdown
+        required: false
+        hint: Optional. A line about why, if there is one.

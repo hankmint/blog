@@ -58,30 +58,14 @@
          heading. A group renders nothing when empty, so this reads correctly
          at one essay and will still read correctly at two hundred. */}}
     {{ range $group := slice
-         (dict "label" "Posts" "url" "/posts/" "blurb" "Longer pieces" "items" $restPosts)
-         (dict "label" "Micro" "url" "/micro/" "blurb" "Short things, mostly a photograph" "items" $restMicro) }}
+         (dict "label" "Posts" "url" "/posts/" "items" $restPosts)
+         (dict "label" "Micro" "url" "/micro/" "items" $restMicro) }}
       {{ with $group.items }}
         <div class="mint-index-head">
-          <h2>{{ $group.label }}</h2>
-          <span class="blurb">{{ $group.blurb }}</span>
+          <h2><a href="{{ $group.url }}">{{ $group.label }}</a></h2>
           <span class="count">{{ len . }}</span>
         </div>
-        {{ $year := "" }}
-        {{ range . }}
-          {{ $y := .Date.Format "2006" }}
-          {{ if ne $y $year }}
-            {{ if ne $year "" }}</ul>{{ end }}
-            <div class="mint-year">{{ $y }}</div>
-            <ul class="mint-entries">
-            {{ $year = $y }}
-          {{ end }}
-          <li><a class="mint-entry h-entry" href="{{ .RelPermalink }}">
-            <span class="date">{{ .Date.Format "Jan 02" }}</span>
-            <span class="ttl p-name">{{ with .Title }}{{ . }}{{ else }}{{ .Plain | plainify | truncate 90 }}{{ end }}</span>
-            <span class="topic">{{ with .Params.categories }}<span class="dot"></span>{{ index . 0 }}{{ end }}</span>
-          </a></li>
-        {{ end }}
-        {{ if ne $year "" }}</ul>{{ end }}
+        {{ partial "entry-list.html" (dict "items" .) }}
       {{ end }}
     {{ end }}
   </section>

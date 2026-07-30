@@ -1,0 +1,30 @@
+{{ define "body_class" }}list-template{{ end }}
+{{ define "main" }}
+{{ $items := .Pages.ByDate.Reverse }}
+<main class="content mint-index mint-index-first" role="main">
+  <div class="mint-index-head">
+    <h1>Music</h1>
+    <span class="count">{{ len $items }}</span>
+  </div>
+  {{ with .Content }}<div class="mint-section-intro">{{ . }}</div>{{ end }}
+  {{/* Deliberately a list of links, not a page of players. Forty embedded
+       players is an unusable page and several megabytes; the player belongs on
+       the song's own page, where someone has chosen to hear it. */}}
+  {{ $year := "" }}
+  {{ range $items }}
+    {{ $y := .Date.Format "2006" }}
+    {{ if ne $y $year }}
+      {{ if ne $year "" }}</ul>{{ end }}
+      <div class="mint-year">{{ $y }}</div>
+      <ul class="mint-entries">
+      {{ $year = $y }}
+    {{ end }}
+    <li><a class="mint-entry h-entry" href="{{ .RelPermalink }}">
+      <span class="date">{{ .Date.Format "Jan 02" }}</span>
+      <span class="ttl p-name">{{ .Title }}</span>
+      <span class="topic">{{ with .Params.artist }}<span class="dot"></span>{{ . }}{{ end }}</span>
+    </a></li>
+  {{ end }}
+  {{ if ne $year "" }}</ul>{{ end }}
+</main>
+{{ end }}
