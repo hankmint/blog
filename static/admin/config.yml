@@ -38,15 +38,41 @@ collections:
     # Posts are Hugo page bundles: content/YYYY/MM/DD/slug/index.md.
     #
     # Photographs deliberately do NOT live inside the bundle. They go to
-    # static/uploads, set globally above. Keeping content/ as pure markdown
-    # matters: the editor fetches the blob of every file inside a collection's
-    # folder, so images in there make it pull megabytes of base64 before it can
-    # show you anything.
+    # static/uploads. Keeping content/ as pure markdown matters: the editor
+    # fetches the blob of every file inside a collection's folder, so images in
+    # there make it pull megabytes of base64 before it can show you anything.
+    #
+    # THE LEADING SLASH BELOW IS LOad-BEARING. The global media_folder at the
+    # top of this file is NOT enough on its own: for a collection whose path
+    # builds a page bundle, uploads were still landing next to index.md, which
+    # is what commit 5dddd6d had already fixed once and what put 9 MB of
+    # photographs back into content/ on 2026-07-30.
+    #
+    # A collection-level media_folder WITHOUT a leading slash means "beside the
+    # entry", which is the behaviour being prevented. WITH the leading slash it
+    # is resolved from the repository root. Do not remove it, and do not make
+    # these paths relative.
+    media_folder: "/static/uploads/2026"
+    public_folder: "/uploads/2026"
     path: "{{year}}/{{month}}/{{day}}/{{slug}}/index"
     create: true
     extension: md
     format: yaml-frontmatter
     sortable_fields: [date, title]
+    # Drafts are ordinary entries in this list, so they are reopened and edited
+    # like anything else. These two make them findable rather than mixed in:
+    # the list groups into Draft and Published, and the filters isolate either.
+    # Without this a draft looks identical to a live post in the sidebar.
+    view_groups:
+      - label: Status
+        field: draft
+    view_filters:
+      - label: Drafts
+        field: draft
+        pattern: true
+      - label: Published
+        field: draft
+        pattern: false
     # content/ also holds About, Gallery, Archive, Stories and Replies. Only
     # things marked as a post belong in this collection.
     filter:
@@ -58,6 +84,38 @@ collections:
         widget: string
         required: false
         hint: Optional. Leave empty for a short note; give it a title and it becomes a featured essay on the homepage.
+      # THE TWO SWITCHES BELOW ARE THE PUBLISH CONTROLS. Read this before
+      # changing either default.
+      #
+      # Sveltia has ONE button, Save, and no editorial workflow: version 0.176.0
+      # rejects publish_mode: editorial_workflow outright with
+      # "Editorial workflow is not yet supported". So there is no way to give
+      # the toolbar a separate "Save draft" and "Post". These two switches are
+      # that choice, moved into the form where it can be defaulted to safe.
+      #
+      # Both default to the quiet setting. Save on a new post writes a draft and
+      # nothing else happens. Publishing, and cross-posting, are things that
+      # have to be deliberately switched on.
+      - name: draft
+        label: Draft — keep this to myself
+        widget: boolean
+        required: false
+        default: true
+        hint: ON is Save Draft. It is committed and safe, but off the site and off every network. Turn OFF and Save when it should go live.
+      # Publishing to the site and broadcasting to a dozen networks are separate
+      # decisions and are separated here. layouts/index.json builds /feed.json
+      # from this field only, and /feed.json is what Micro.blog relays to
+      # Bluesky, Mastodon, Threads, LinkedIn, Tumblr, Medium, Flickr, Nostr,
+      # Pixelfed, PeerTube, Day One and YouTube.
+      #
+      # Human RSS readers are unaffected: /feed.xml still carries every
+      # published post. This gates the relay, not the blog.
+      - name: crosspost
+        label: Also send to social networks
+        widget: boolean
+        required: false
+        default: false
+        hint: OFF, the post lives on the site only. ON, it is also relayed to Bluesky, Mastodon, Threads, LinkedIn and the rest. Sending cannot be undone. Leave OFF unless you mean it.
       - name: date
         label: Date
         widget: datetime
