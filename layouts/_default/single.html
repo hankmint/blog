@@ -4,6 +4,11 @@
   <article class="h-entry post page">
     <header class="post-header">
       <h1 class="p-name post-title">{{ .Title }}</h1>
+      {{/* The site tagline used to sit in the masthead on every page, where it
+           was furniture. It lives on /about/ now, set in that page's front
+           matter, and keeps the letterspaced treatment it had as the home page
+           eyebrow so it still reads as a standfirst, not as body copy. */}}
+      {{ with .Params.tagline }}<p class="page-tagline">{{ . }}</p>{{ end }}
     </header>
     <section class="e-content post-content">
       {{ .Content }}

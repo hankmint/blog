@@ -29,7 +29,6 @@
        the hidden h-card there for microformats. */}}
   {{ with $featured }}
   <section class="mint-lede">
-    <div class="mint-eyebrow">{{ $.Site.Params.description | default "Latest" | safeHTML }}</div>
     <div class="mint-featured">
       {{ range . }}
         <article class="feat h-entry">
@@ -54,19 +53,19 @@
          far and a separate Posts page would list a single item. */}}
     {{ $rest := complement $featured $posts }}
     {{ $restPosts := where $rest "Title" "!=" "" }}
-    {{ $restNotes := where $rest "Title" "eq" "" }}
+    {{ $restMicro := where $rest "Title" "eq" "" }}
     {{/* Posts first, then Notes. Each still grouped by year inside its own
          heading. A group renders nothing when empty, so this reads correctly
          at one essay and will still read correctly at two hundred. */}}
     {{ range $group := slice
-         (dict "label" "Posts" "blurb" "Longer pieces." "items" $restPosts)
-         (dict "label" "Notes" "blurb" "Short things, mostly with a photograph." "items" $restNotes) }}
+         (dict "label" "Posts" "url" "/posts/" "blurb" "Longer pieces" "items" $restPosts)
+         (dict "label" "Micro" "url" "/micro/" "blurb" "Short things, mostly a photograph" "items" $restMicro) }}
       {{ with $group.items }}
         <div class="mint-index-head">
           <h2>{{ $group.label }}</h2>
+          <span class="blurb">{{ $group.blurb }}</span>
           <span class="count">{{ len . }}</span>
         </div>
-        <p class="mint-index-blurb">{{ $group.blurb }}</p>
         {{ $year := "" }}
         {{ range . }}
           {{ $y := .Date.Format "2006" }}

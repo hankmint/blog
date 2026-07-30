@@ -1,0 +1,66 @@
+# Optimise photographs after they are committed.
+#
+# The editor commits straight to GitHub, so nothing on this machine ever runs
+# on the way in. Every photograph posted from a phone arrived at full size with
+# no thumbnail: 7.9 MB for one screenshot on 2026-07-30, and the gallery fell
+# back to serving the full file because the thumbnail it wanted did not exist.
+#
+# Worse, it was also the step that keeps a photograph the right way up. Pillow
+# drops EXIF on save, so orientation has to be baked into the pixels. Doing that
+# by hand meant it did not happen, and a sunrise went out on its side.
+#
+# So it runs here instead, on every push that touches an image, and commits the
+# result back. Runs after the fact rather than before, because the alternative
+# is asking the editor to wait.
+name: Optimise images
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'static/uploads/**'
+      - 'scripts/optimize-images.py'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: optimise-images
+  cancel-in-progress: false
+
+jobs:
+  optimise:
+    # Its own commit touches static/uploads and would trigger it again. The
+    # commit message is the guard.
+    if: "!contains(github.event.head_commit.message, '[skip-optimise]')"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Pillow
+        run: pip install --quiet Pillow
+
+      - name: Optimise
+        run: python3 scripts/optimize-images.py
+
+      - name: Commit anything that changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet; then
+            echo "nothing to optimise"
+            exit 0
+          fi
+          git add static/uploads
+          git commit -m "chore: optimise images [skip-optimise]
+
+          Ran automatically on push. Recompresses photographs, writes the 400px
+          thumbnails the gallery needs, and bakes EXIF rotation into the pixels
+          so a portrait photograph does not arrive on its side."
+          git push
