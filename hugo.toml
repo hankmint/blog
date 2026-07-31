@@ -57,6 +57,23 @@ pluralizeListTitles = false
   baseName = "feed"
   mediaType = "application/json"
 
+# Markdown output exists for ONE page, /export/, which opts in through its own
+# front matter.
+#
+# It is NOT on `page` globally, and must not be. Every imported Micro.blog post
+# carries an explicit url: ending in .html, and with two output formats Hugo
+# writes both to that same path: the markdown rendered second and overwrote the
+# HTML. Fifteen live posts became raw front matter in the browser. The harness
+# caught it; the caption assertion failed because its fixture uses the same
+# explicit-.html shape.
+[mediaTypes."text/markdown"]
+  suffixes = ["md"]
+
+[outputFormats.MD]
+  mediaType = "text/markdown"
+  isPlainText = true
+  notAlternative = false
+
 [outputs]
   home = ["HTML", "RSS", "JSON"]
   page = ["HTML"]

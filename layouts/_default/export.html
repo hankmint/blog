@@ -1,0 +1,38 @@
+{{ define "body_class" }}page-template{{ end }}
+{{ define "main" }}
+{{ $posts := (where site.RegularPages "Type" "post").ByDate.Reverse }}
+<main class="content" role="main">
+  <article class="h-entry post page">
+    <header class="post-header">
+      <h1 class="p-name post-title">{{ .Title }}</h1>
+      {{ with .Params.tagline }}<p class="page-tagline">{{ . }}</p>{{ end }}
+    </header>
+    <section class="e-content post-content">
+      <p>Everything here is markdown underneath, so it can leave whenever it wants to.
+      Nothing is locked in a database.</p>
+
+      <p><a href="/export/index.md" download><strong>Download all {{ len $posts }} posts</strong></a>
+      as one markdown file, front matter and all.</p>
+
+      <p>The whole site, photographs included, lives at
+      <a href="https://github.com/hankmint/blog">github.com/hankmint/blog</a> &mdash;
+      <em>Code &rarr; Download ZIP</em>, or clone it.</p>
+
+      <div class="mint-index-head"><h2>Per post</h2></div>
+      <p>Each one is a file in the repository under <code>content/</code>. Append
+      <code>?plain=1</code> to a GitHub file URL, or use
+      <code>raw.githubusercontent.com</code>, to get the markdown on its own:</p>
+      <ul class="mint-entries">
+        {{ range first 5 $posts }}
+          <li><a class="mint-entry" href="https://raw.githubusercontent.com/hankmint/blog/main/content/{{ .File.Path }}">
+            <span class="date">{{ .Date.Format "Jan 02 2006" }}</span>
+            <span class="ttl">{{ with .Title }}{{ . }}{{ else }}{{ .Plain | plainify | truncate 70 }}{{ end }}</span>
+            <span class="topic">.md</span>
+          </a></li>
+        {{ end }}
+      </ul>
+      <p class="mint-index-blurb">Showing 5 of {{ len $posts }}. The rest are in the same place.</p>
+    </section>
+  </article>
+</main>
+{{ end }}
