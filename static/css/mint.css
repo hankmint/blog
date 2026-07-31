@@ -459,9 +459,12 @@ body > main, body > .content { flex: 1 0 auto; }
 
 /* Same treatment the tagline had as the home page eyebrow, so moving it to
    /about/ did not turn it into an ordinary sentence. */
+/* Standfirst. It sat tight under the title and tight on top of whatever came
+   next, so it read as crowding rather than as a line of its own. */
 .page-tagline {
   font-family: var(--sans); font-size: .7rem; letter-spacing: .2em;
-  text-transform: uppercase; color: var(--accent); margin: .6rem 0 0;
+  text-transform: uppercase; color: var(--accent);
+  margin: .9rem 0 0; line-height: 1.6;
 }
 
 /* About: portrait and copy side by side.
@@ -469,7 +472,7 @@ body > main, body > .content { flex: 1 0 auto; }
    picture sitting alone above the text. A flex row does not have that argument.
    .post-content img sets width:100%, so the portrait needs flex-shrink:0 and an
    explicit width that beats it. */
-.about-row { display: flex; align-items: flex-start; gap: 1.5rem; }
+.about-row { display: flex; align-items: flex-start; gap: 1.8rem; margin-top: 2.2rem; }
 .about-copy { flex: 1; min-width: 0; }
 .about-copy > p:first-child { margin-top: 0; }
 .post-content .about-portrait {
@@ -480,7 +483,8 @@ body > main, body > .content { flex: 1 0 auto; }
 /* On a phone a 132px float leaves a column of text three words wide. Stack it. */
 @media (max-width: 640px) {
   /* 132px beside text on a 360px screen leaves a column three words wide. */
-  .about-row { flex-direction: column; gap: 1.1rem; }
+  /* Picture below the words on a phone, matching source order. */
+  .about-row { flex-direction: column; gap: 1.2rem; margin-top: 1.6rem; }
   .post-content .about-portrait { width: 108px; height: 108px; }
   .mint-index-head { flex-wrap: wrap; gap: .3rem .7rem; }
   .page-tagline { letter-spacing: .14em; }

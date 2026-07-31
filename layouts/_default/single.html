@@ -21,9 +21,14 @@
            it lost to .post-content img, which is more specific. A flex row does
            not depend on winning a specificity argument. */}}
       {{ with .Params.portrait }}
+        {{/* Copy first in the markup, picture second. Putting the picture
+             first pushed the writing off the left margin, which is where the
+             eye starts and where it was before there was a picture. Source
+             order also decides reading order for a screen reader, so the words
+             should come first there too. */}}
         <div class="about-row">
-          <img class="about-portrait" src="{{ . }}" alt="{{ $.Site.Params.author.name }}" width="132" height="132" />
           <div class="about-copy">{{ $.Content }}</div>
+          <img class="about-portrait" src="{{ . }}" alt="{{ $.Site.Params.author.name }}" width="132" height="132" />
         </div>
       {{ else }}
         {{ .Content }}
