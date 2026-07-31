@@ -134,6 +134,14 @@ collections:
       # Labelled "Write", not "Post". Sveltia's only button says Save, so the
       # word Post sitting above the text box read like the missing publish
       # button and was mistaken for one.
+      # Which photograph represents the post when the link is shared. Without
+      # this the first picture in the post wins by default, which is rarely the
+      # one worth leading with.
+      - name: share_image
+        label: Share image
+        widget: image
+        required: false
+        hint: Optional. The picture that shows when this post is shared. Leave empty and the first photograph in the post is used.
       - name: body
         label: Write
         widget: markdown

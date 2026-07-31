@@ -26,8 +26,17 @@
     {{- if not $desc }}{{ $desc = .Site.Params.description }}{{ end -}}
     {{- $title := cond .IsHome .Site.Title (printf "%s - %s" .Title .Site.Title) -}}
     {{- if and (not .IsHome) (not .Title) }}{{ $title = .Site.Title }}{{ end -}}
+    {{/* Which photograph gets shared, in order:
+           1. share_image, chosen deliberately in the editor
+           2. images:, which the Micro.blog import wrote
+           3. the first photograph in the post
+           4. the MINT card
+         Until now there was no way to express (1), so a post always shared
+         whichever picture happened to come first, which is rarely the one
+         worth leading with. */}}
     {{- $img := "" -}}
-    {{- with .Params.images }}{{ $img = index . 0 }}{{ end -}}
+    {{- with .Params.share_image }}{{ $img = . }}{{ end -}}
+    {{- if not $img }}{{ with .Params.images }}{{ $img = index . 0 }}{{ end }}{{ end -}}
     {{- if not $img -}}
       {{- range first 1 (findRE `<img[^>]+src="[^"]+"` .Content) -}}
         {{- $img = replaceRE `.*src="([^"]+)".*` "$1" . -}}
