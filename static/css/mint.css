@@ -373,13 +373,41 @@ body > main, body > .content { flex: 1 0 auto; }
 /* ---------- responsive ---------- */
 @media (max-width: 640px) {
   body { font-size: 17px; }
-  nav.nav { gap: .9rem; }
-  nav.nav a { font-size: .64rem; }
+
+  /* The masthead was one unbreakable row: wordmark, four nav items and the dark
+     toggle, laid out with space-between and no wrapping. On a phone it simply
+     ran past the right edge and the toggle was cut in half. It wraps now, and
+     the nav is allowed to take a second line rather than push anything off. */
+  .masthead-inner {
+    padding: .7rem 1rem; flex-wrap: wrap; gap: .5rem .8rem;
+    justify-content: flex-start;
+  }
+  .blog-title { flex: 0 0 auto; }
   .blog-title .by { display: none; }
+  nav.nav {
+    order: 3; flex: 1 1 100%;
+    gap: 1.1rem; flex-wrap: wrap;
+    /* Long enough that it will scroll rather than stack awkwardly at five or
+       six items, and the scroll bar is hidden because it is not a scroll area
+       anyone should have to notice. */
+    overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  }
+  nav.nav::-webkit-scrollbar { display: none; }
+  nav.nav a { font-size: .66rem; white-space: nowrap; }
+  .mint-theme-toggle { margin-left: auto; flex: 0 0 auto; }
+
   .mint-entry { grid-template-columns: 3.6rem 1fr; }
   .mint-entry .topic { display: none; }
   .mint-gallery { columns: 2 140px; }
-  .masthead-inner { padding: .7rem 1rem; }
+
+  /* Nothing may push the page sideways. clip, not hidden: hidden makes the
+     element a scroll container, and the masthead above is position: sticky,
+     which stops working inside one. clip does the same job without that. */
+  body { overflow-x: clip; }
+  .content { padding-left: 1.15rem; padding-right: 1.15rem; }
+  .mint-index-head { flex-wrap: nowrap; gap: .6rem; }
+  .mint-index-head h1, .mint-index-head h2 { min-width: 0; }
+  .mint-index-head .count { flex: 0 0 auto; }
 }
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }

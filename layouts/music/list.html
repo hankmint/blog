@@ -1,7 +1,8 @@
 {{ define "body_class" }}list-template{{ end }}
 {{ define "main" }}
 {{ $items := .Pages.ByDate.Reverse }}
-<main class="content mint-index mint-index-first" role="main">
+<main class="content" role="main">
+  <section class="mint-index mint-index-first">
   <div class="mint-index-head">
     <h1>Music</h1>
     <span class="count">{{ len $items }}</span>
@@ -26,5 +27,6 @@
     </a></li>
   {{ end }}
   {{ if ne $year "" }}</ul>{{ end }}
+  </section>
 </main>
 {{ end }}

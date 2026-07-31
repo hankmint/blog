@@ -3,12 +3,18 @@
 {{/* Short things. Untitled by definition, so each entry shows its opening line
      in place of a headline, which is what the home page does too. */}}
 {{ $items := (partial "split-posts.html" .).short }}
-<main class="content mint-index mint-index-first" role="main">
+{{/* .content carries the side padding; .mint-index zeroes horizontal padding
+     for its use inside the home page. Putting both on one element let the zero
+     win and the text ran to the edge of the screen. Nested, as on the home
+     page. */}}
+<main class="content" role="main">
+  <section class="mint-index mint-index-first">
   <div class="mint-index-head">
     <h1>Micro</h1>
     <span class="count">{{ len $items }}</span>
   </div>
   {{ with .Content }}<div class="mint-section-intro">{{ . }}</div>{{ end }}
   {{ partial "entry-list.html" (dict "items" $items) }}
+  </section>
 </main>
 {{ end }}
