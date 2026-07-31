@@ -243,9 +243,20 @@ nav.nav a.nav-current::after { right: 0; }
 .mint-gal-head { padding: 3.4rem 0 1.8rem; }
 .mint-gal-head h1 { font-family: var(--serif-display); font-weight: 600; font-size: clamp(2rem,5vw,2.8rem); margin: 0 0 .5rem; letter-spacing: -.01em; }
 .mint-gal-head p { color: var(--ink-soft); margin: 0; max-width: 34rem; font-style: italic; }
-.mint-gallery { columns: 3 220px; column-gap: 14px; padding-bottom: 4.5rem; }
+/* Grid, not columns. CSS multi-column fills top-to-bottom and only then moves
+   right, so a gallery in date order read down column one, then down column two.
+   Nobody reads a grid that way. Grid flows left-to-right, which is the order
+   the dates are actually in.
+   The cost is that tiles have to share a height, since real left-to-right
+   masonry needs either JS or grid-template-rows: masonry, which is not
+   broadly supported. A 4:5 tile is the compromise: portrait photographs sit
+   comfortably and landscape ones crop to the middle. */
+.mint-gallery {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px; padding-bottom: 4.5rem;
+}
 .mint-shot {
-  break-inside: avoid; margin: 0 0 14px; width: 100%; display: block;
+  margin: 0; width: 100%; display: block; aspect-ratio: 4 / 5;
   border-radius: 3px; overflow: hidden; position: relative; box-shadow: 0 8px 28px -14px var(--shadow);
   transition: transform .3s, box-shadow .3s; background: var(--paper-2);
 }
@@ -254,13 +265,13 @@ nav.nav a.nav-current::after { right: 0; }
 /* The first photograph sits in normal flow and gives the tile its height, so the
    masonry column does not jump when the carousel advances. The rest are laid
    over it and cropped to fit, the way a phone gallery behaves. */
-.mint-slides { position: relative; display: block; }
-.mint-slide { width: 100%; display: block; cursor: zoom-in; }
+.mint-slides { position: relative; display: block; height: 100%; }
+.mint-slide { width: 100%; height: 100%; object-fit: cover; display: block; cursor: zoom-in; }
 
 /* The first photograph is the base layer. It is never faded out, only covered.
    Fading it out meant that while the next slide was arriving, or crossfading,
    the tile's own background showed through and the whole thing went white. */
-.mint-slide:first-child { opacity: 1; }
+.mint-slide:first-child { opacity: 1; position: absolute; inset: 0; }
 .mint-slide:not(:first-child) {
   position: absolute; inset: 0; height: 100%; object-fit: cover;
   opacity: 0; transition: opacity .28s ease;
@@ -374,7 +385,7 @@ body > main, body > .content { flex: 1 0 auto; }
   .blog-title .by { display: none; }
   .mint-entry { grid-template-columns: 3.6rem 1fr; }
   .mint-entry .topic { display: none; }
-  .mint-gallery { columns: 2 140px; }
+  .mint-gallery { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
   .masthead-inner { padding: .7rem 1rem; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -516,4 +527,16 @@ body > main, body > .content { flex: 1 0 auto; }
    The swipe handler covers touch, so they can stay hover-only on a pointer. */
 @media (hover: none) {
   .mint-arrow { opacity: .85; }
+}
+
+/* /things/ — the running list. Same skeleton as the post index so the site does
+   not grow a second visual language for a list of dated lines. */
+.mint-entries.things li { display: grid; grid-template-columns: 6.5rem 1fr; align-items: baseline; }
+.mint-entries.things .ttl { font-family: var(--serif-body); }
+.mint-entries.things .note {
+  display: block; font-family: var(--sans); font-size: .74rem;
+  color: var(--muted); margin-top: .15rem;
+}
+@media (max-width: 640px) {
+  .mint-entries.things li { grid-template-columns: 1fr; gap: .15rem; }
 }

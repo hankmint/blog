@@ -1,0 +1,44 @@
+{{ define "body_class" }}page-template{{ end }}
+{{ define "main" }}
+{{/* One list, grouped by what kind of thing it is, newest first inside each
+     group. Reads from data/things.yaml rather than from a post per item: the
+     point of this page is that adding to it costs nothing, and a post is a
+     commitment to write something. */}}
+{{ $all := site.Data.things.things }}
+<main class="content" role="main">
+  <article class="h-entry post page">
+    <header class="post-header">
+      <h1 class="p-name post-title">{{ .Title }}</h1>
+      {{ with .Params.tagline }}<p class="page-tagline">{{ . }}</p>{{ end }}
+    </header>
+    <section class="e-content post-content">
+      {{ with .Content }}{{ . }}{{ end }}
+      {{ range $g := slice
+           (dict "key" "building" "label" "Building")
+           (dict "key" "shipped"  "label" "Shipped")
+           (dict "key" "reading"  "label" "Reading")
+           (dict "key" "life"     "label" "Life") }}
+        {{ $items := where $all "kind" $g.key }}
+        {{ with $items }}
+          {{ $sorted := sort . "date" "desc" }}
+          <div class="mint-index-head">
+            <h2>{{ $g.label }}</h2>
+            <span class="count">{{ len $sorted }}</span>
+          </div>
+          <ul class="mint-entries things">
+            {{ range $sorted }}
+              <li>
+                <span class="date">{{ with .date }}{{ (time (printf "%s-01" .)).Format "Jan 2006" }}{{ end }}</span>
+                <span class="ttl">
+                  {{ if .url }}<a href="{{ .url }}">{{ .what }}</a>{{ else }}{{ .what }}{{ end }}
+                  {{ with .note }}<span class="note">{{ . }}</span>{{ end }}
+                </span>
+              </li>
+            {{ end }}
+          </ul>
+        {{ end }}
+      {{ end }}
+    </section>
+  </article>
+</main>
+{{ end }}

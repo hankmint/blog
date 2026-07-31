@@ -204,3 +204,38 @@ collections:
         widget: markdown
         required: false
         hint: Optional. A line about why, if there is one.
+
+  # /things/ — the running list of what you are building, what shipped, what you
+  # are reading. A single file edited through a list widget, not one entry per
+  # file: the only thing that makes a list like this survive is that adding to
+  # it costs nothing. Open, tap Add, type a line, Save.
+  - name: things
+    label: Things
+    files:
+      - name: things
+        label: The list
+        file: data/things.yaml
+        fields:
+          - name: things
+            label: Things
+            label_singular: Thing
+            widget: list
+            summary: "{{fields.what}}"
+            fields:
+              - { name: what, label: What, widget: string }
+              - name: kind
+                label: Kind
+                widget: select
+                default: building
+                options:
+                  - { label: "Building — in progress", value: building }
+                  - { label: "Shipped — done", value: shipped }
+                  - { label: "Reading", value: reading }
+                  - { label: "Life", value: life }
+              - name: date
+                label: When
+                widget: string
+                default: ""
+                hint: "YYYY-MM. The month is enough."
+              - { name: url, label: Link, widget: string, required: false }
+              - { name: note, label: Note, widget: string, required: false, hint: One line, optional. }

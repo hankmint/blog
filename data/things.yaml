@@ -1,0 +1,107 @@
+# Everything, in one file, so it stops living in your head.
+#
+# Add a line the moment a thing happens. That is the whole discipline. It is one
+# file rather than a post per item on purpose: a post is a decision and a
+# commitment to write something, a line is not, and a system you have to think
+# about before using is one you will stop using.
+#
+# kind:   building | shipped | reading | life
+# date:   YYYY-MM  is enough. Exact days are not the point here.
+# url:    optional
+# note:   optional, one line
+#
+# Seeded from what came up while building this site. NOT verified against your
+# records: check the dates, fix what is wrong, delete what does not belong.
+#
+# Top-level key is "things" because the editor's list widget writes it that way.
+# A bare list at the top of the file would read a little cleaner here, but then
+# the editor could not manage it, and a list only you can edit by hand is a list
+# that stops getting edited.
+things:
+  - what: This blog
+    kind: building
+    date: 2026-07
+    url: /
+    note: Rebuilt off Micro.blog onto Hugo
+
+  - what: Midwest Appliance Parts
+    kind: building
+    date: 2026-07
+    note: Consulting. Shopify at four million products
+
+  - what: Quo Vadis
+    kind: building
+    date: 2026-07
+    url: https://liliia-turchyn.vercel.app
+    note: Built Liliia a blog, migrated two years of Telegram into it
+
+  - what: MintVerse
+    kind: building
+    date: 2026-06
+
+  - what: CodeMend
+    kind: building
+    date: 2026-07
+    url: https://codemend.ai
+    note: Formerly AutoHeal AI. A product of Knod, Inc.
+
+  - what: Knod
+    kind: building
+    date: 2026-05
+    url: https://knod.ai
+
+  - what: The Watcher
+    kind: building
+    date: 2026-07
+    note: TODO — say what this is
+
+  - what: OnionDAO badge
+    kind: building
+    date: 2026-04
+    note: ESP32-S3 firmware, beacon check-in
+
+  - what: Professor AI
+    kind: building
+    date: 2026-06
+    note: Any professor can clone themselves. RAG, voice, avatar
+
+  - what: Filed the Knod provisional patent
+    kind: shipped
+    date: 2026-04
+    note: Application 64/030,857
+
+  - what: The Flow
+    kind: shipped
+    date: 2026-07
+    url: https://theflow-dnastone.vercel.app
+    note: Pitch demo for DNA&STONE
+
+  # --- Things you mentioned that I do not know enough about to write down for
+  # --- you. Fill these in or bin them; I am not going to invent your life.
+
+  - what: Started swimming again
+    kind: life
+    date: 2026-07
+
+  - what: Interns
+    kind: life
+    date: 2026-07
+    note: TODO — who, where, doing what
+
+  - what: Volunteering
+    kind: life
+    date: 2026-07
+    note: TODO — where
+
+  - what: Games
+    kind: building
+    date: 2026-07
+    note: TODO — which
+
+  - what: TODO — the paper you published
+    kind: shipped
+    date: 2026-07
+
+  - what: TODO — what you are reading now
+    kind: reading
+    date: 2026-07
