@@ -1,8 +1,6 @@
 ---
 title: "Now"
 navigation: true
-menu: main
-weight: 4
 date: 2026-07-30T18:00:00-05:00
 url: /now/
 tagline: "What I am doing at the moment."

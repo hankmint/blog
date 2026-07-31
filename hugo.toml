@@ -35,6 +35,18 @@ pluralizeListTitles = false
 #
 # These four blocks are carried over verbatim from Micro.blog's own exported
 # config.json, so the feeds keep the exact paths and shape their relay reads.
+# The service worker is a template so its cache version can be stamped at build
+# time. A fixed version string meant its caches were never evicted, which served
+# a stale stylesheet and a sideways photograph long after both were fixed.
+[mediaTypes."text/javascript"]
+  suffixes = ["js"]
+
+[outputFormats.SW]
+  mediaType = "text/javascript"
+  baseName = "sw"
+  isPlainText = true
+  notAlternative = true
+
 [mediaTypes."application/json"]
   suffixes = ["json"]
 
