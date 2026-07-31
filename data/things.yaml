@@ -105,3 +105,18 @@ things:
   - what: TODO — what you are reading now
     kind: reading
     date: 2026-07
+
+  # --- Caught mid-recall on 2026-07-30. Dates unknown: fill them in, or leave
+  # --- them off. An undated line is still better than a forgotten one.
+  - what: Started a magazine
+    kind: shipped
+    date: ""
+  - what: Started a radio show
+    kind: shipped
+    date: ""
+  - what: Made frames
+    kind: shipped
+    date: ""
+  - what: Started Knod
+    kind: shipped
+    date: ""
