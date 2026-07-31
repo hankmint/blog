@@ -236,6 +236,6 @@ collections:
                 label: When
                 widget: string
                 default: ""
-                hint: "YYYY-MM. The month is enough."
+                hint: "YYYY-MM, or just YYYY for anything you only remember the year of."
               - { name: url, label: Link, widget: string, required: false }
               - { name: note, label: Note, widget: string, required: false, hint: One line, optional. }

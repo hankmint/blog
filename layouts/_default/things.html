@@ -28,7 +28,13 @@
           <ul class="mint-entries things">
             {{ range $sorted }}
               <li>
-                <span class="date">{{ with .date }}{{ (time (printf "%s-01" .)).Format "Jan 2006" }}{{ end }}</span>
+                <span class="date">{{ with .date }}
+                    {{/* Anything older than about a year is remembered by year,
+                         not by month. Accept both rather than forcing a made-up
+                         month onto something that happened in 2019. */}}
+                    {{ if eq (len (string .)) 4 }}{{ . }}
+                    {{ else }}{{ (time (printf "%s-01" .)).Format "Jan 2006" }}{{ end }}
+                  {{ end }}</span>
                 <span class="ttl">
                   {{ if .url }}<a href="{{ .url }}">{{ .what }}</a>{{ else }}{{ .what }}{{ end }}
                   {{ with .note }}<span class="note">{{ . }}</span>{{ end }}
