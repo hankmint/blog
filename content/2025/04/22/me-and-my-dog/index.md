@@ -2,6 +2,8 @@
 title: Me and My Dog
 date: 2025-04-22T14:48:00-05:00
 type: post
+aliases:
+  - /2025/04/22/144854/
 images:
   - /uploads/2025/1-2.png
 summary: ''
