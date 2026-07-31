@@ -489,3 +489,31 @@ body > main, body > .content { flex: 1 0 auto; }
   border-top: 1px solid var(--rule); padding-top: 1rem; margin-top: 2rem; clear: both;
 }
 .mint-section-intro { color: var(--muted); margin-bottom: 1.6rem; }
+
+/* Lightbox. The tiles have said cursor: zoom-in since the gallery was built;
+   nothing zoomed until the script existed. */
+.mint-lightbox {
+  position: fixed; inset: 0; z-index: 100; display: none;
+  align-items: center; justify-content: center; flex-direction: column;
+  background: rgba(0,0,0,.92); padding: 3vmin;
+}
+.mint-lightbox.is-on { display: flex; }
+.mint-lightbox img {
+  max-width: 100%; max-height: 88vh; width: auto; height: auto;
+  object-fit: contain; border-radius: 4px; box-shadow: none;
+}
+.mint-lightbox figcaption {
+  color: rgba(255,255,255,.72); font-family: var(--sans); font-size: .74rem;
+  margin-top: .9rem; text-align: center;
+}
+.mint-lightbox-close {
+  position: absolute; top: 1rem; right: 1.2rem; z-index: 1;
+  background: none; border: 0; color: #fff; font-size: 2rem; line-height: 1;
+  cursor: pointer; padding: .2rem .6rem; opacity: .8;
+}
+.mint-lightbox-close:hover { opacity: 1; }
+/* The arrows were hidden until hover, which on a touch screen means never.
+   The swipe handler covers touch, so they can stay hover-only on a pointer. */
+@media (hover: none) {
+  .mint-arrow { opacity: .85; }
+}
