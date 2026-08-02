@@ -6,7 +6,7 @@ date: 2026-08-02T10:20:00-05:00
 type: post
 categories:
   - Life
-share_image: ''
+share_image: /uploads/2026/IMG_2851.jpeg
 ---
 
 This weekend has been an eventful one. The rains didn’t seem as bad as expected. Tried some new Pueto Rican food. Spent my late afternoon with Hank chasing the high tides and chilling at the lake as usual. 
