@@ -1,0 +1,103 @@
+# Tell Kay when something is written but not live.
+#
+# On 2026-08-02 a full post with seven photographs was written on a phone,
+# saved, and committed cleanly. It never appeared on the site, because `draft`
+# defaults to true and Save is not publish. Nothing failed, so nothing reported
+# anything, and it sat unnoticed for three days. The symptom he described was
+# "it just spun and nothing happened". Nothing spun. The system was silent.
+#
+# Like optimise-images.yml, this runs AFTER the fact rather than in the way:
+# the editor commits straight to GitHub, so this is the first place that can
+# see what happened, and it must never make the phone wait.
+#
+# It maintains exactly ONE issue, reused forever. A notification system that
+# accumulates is one you learn to dismiss without reading, and this has to
+# still work in six months.
+name: Draft watch
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'content/**'
+      - 'scripts/find-drafts.py'
+      - '.github/workflows/draft-watch.yml'
+  # The nudge for anything left sitting. 13:00 UTC is early morning in Chicago.
+  schedule:
+    - cron: '0 13 * * *'
+  # So it can be run by hand, which is how it was first tested.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+# The editor can save three times in ninety seconds. Only the last scan is
+# true, so let it cancel the ones it overtakes.
+concurrency:
+  group: draft-watch
+  cancel-in-progress: true
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # No pip install. find-drafts.py has no dependencies on purpose: this
+      # runs on every push and an install step is one more thing that can fail
+      # at the exact moment it is needed.
+      - name: Scan content for drafts
+        run: python3 scripts/find-drafts.py > "$RUNNER_TEMP/drafts.json"
+
+      - name: Open, update or close the notice
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          COUNT=$(jq -r .count  "$RUNNER_TEMP/drafts.json")
+          TITLE=$(jq -r .title  "$RUNNER_TEMP/drafts.json")
+          jq -r .body "$RUNNER_TEMP/drafts.json" > "$RUNNER_TEMP/body.md"
+
+          # Idempotent. Fails harmlessly once the label exists.
+          gh label create draft-watch \
+            --color FBCA04 \
+            --description "A post is written but not published" \
+            >/dev/null 2>&1 || true
+
+          OPEN=$(gh issue list --label draft-watch --state open \
+                   --json number --jq '.[].number')
+
+          if [ "$COUNT" -gt 0 ]; then
+            if [ -n "$OPEN" ]; then
+              # Reuse the first, and fold away any duplicates a past race left.
+              KEEP=$(echo "$OPEN" | head -1)
+              gh issue edit "$KEEP" --title "$TITLE" --body-file "$RUNNER_TEMP/body.md"
+              echo "updated #$KEEP ($COUNT draft(s))"
+              for n in $(echo "$OPEN" | tail -n +2); do
+                gh issue close "$n" --comment "Superseded by #$KEEP."
+                echo "closed duplicate #$n"
+              done
+            else
+              gh issue create \
+                --label draft-watch \
+                --title "$TITLE" \
+                --body-file "$RUNNER_TEMP/body.md"
+              echo "opened a new notice ($COUNT draft(s))"
+            fi
+          else
+            if [ -n "$OPEN" ]; then
+              for n in $OPEN; do
+                gh issue close "$n" --comment \
+                  "Published. Nothing is sitting in draft. This reopens by itself if anything is."
+                echo "closed #$n"
+              done
+            else
+              echo "nothing in draft, nothing open"
+            fi
+          fi

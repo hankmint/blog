@@ -240,27 +240,44 @@ fi
 
 # The relay is opt-in; the human feed is not. /feed.xml must still carry
 # everything, or gating the cross-post would have quietly gutted RSS too.
+#
+# "Everything" means every PUBLISHED post, which is not the same as every file
+# under content/. Both assertions below hardcoded 18, which was true only while
+# no draft existed. From 2026-08-02 a real post was saved with draft: true and
+# left that way, and from that moment this harness failed twice on a site that
+# was perfectly healthy. Nobody saw it, because nothing runs this harness
+# automatically. It is only ever run by hand, and it was not run.
+#
+# Counted now, not assumed. Drafts are a normal state, not a broken one, and a
+# test that cries wolf every time Kay saves a draft is a test he will learn to
+# ignore. The floor against posts actually going missing is not lost: the
+# content/ count near the top of this file still holds it.
+PUBLISHED=$(find content -path 'content/20*' -name '*.md' -print0 \
+            | xargs -0 grep -L '^draft: true' | wc -l | tr -d ' ')
+echo "    $PUBLISHED published posts in content/, drafts excluded"
+
 if [ -f public/feed.xml ]; then
   n=$(grep -o '<item>' public/feed.xml | wc -l | tr -d ' ')
-  [ "$n" -ge 18 ]
-  check $? "feed.xml still carries every published post (found $n)"
+  [ "$n" -ge "$PUBLISHED" ]
+  check $? "feed.xml carries every published post (found $n, expected $PUBLISHED)"
 fi
 
 if [ -f public/feed.xml ]; then
   # Existence is not validity. Hugo HTML-escapes a literal <?xml declaration
   # unless it is passed through safeHTML, which produced a feed.xml that looked
   # perfectly fine in a text editor and would not parse in any reader.
-  python3 - <<'PY' 2>&1
-import sys, xml.dom.minidom
+  PUBLISHED="$PUBLISHED" python3 - <<'PY' 2>&1
+import os, sys, xml.dom.minidom
 try:
     x = xml.dom.minidom.parse("public/feed.xml")
 except Exception as e:
     print("    feed.xml does not parse:", e, file=sys.stderr); sys.exit(1)
 items = x.getElementsByTagName("item")
-if len(items) < 18:
-    print(f"    expected at least the 18 imported posts, got {len(items)}", file=sys.stderr); sys.exit(1)
+expected = int(os.environ.get("PUBLISHED", "0"))
+if len(items) < expected:
+    print(f"    expected {expected} published posts, got {len(items)}", file=sys.stderr); sys.exit(1)
 PY
-  check $? "feed.xml is well-formed RSS with every post in it"
+  check $? "feed.xml is well-formed RSS with every published post in it"
 fi
 
 # --- The site must show its own content ---

@@ -63,45 +63,89 @@ collections:
     # like anything else. These two make them findable rather than mixed in:
     # the list groups into Draft and Published, and the filters isolate either.
     # Without this a draft looks identical to a live post in the sidebar.
+    # THE OBJECT FORM BELOW IS LOAD-BEARING, exactly like the leading slash on
+    # media_folder further down. Until 2026-08-05 both of these were written as
+    # plain arrays, and in that form THE GROUPING NEVER ONCE APPLIED.
+    #
+    # sveltia-cms.js 0.176.0 resolves view_groups and view_filters through one
+    # helper. Reduced from the vendored bundle:
+    #
+    #   M6 = (e, t) => {
+    #     if (Array.isArray(e)) return { options: e };        // <- no default
+    #     if (isObject(e)) {
+    #       let n = e[t], r = e.default;                      // e.groups / e.filters
+    #       let match = r ? n.find(({ name }) => name === r) : undefined;
+    #       return { options: n, default: match ? {...} : undefined };
+    #     }
+    #   }
+    #
+    # Two things follow. An array can carry no default at all. And `default`
+    # matches an option's `name`, not its `label`, so every option needs a
+    # `name` or the default silently matches nothing. Do not flatten these back
+    # into lists.
     view_groups:
-      - label: Status
-        field: draft
+      default: status
+      groups:
+        - name: status
+          label: Status
+          field: draft
+    # Grouping is defaulted, filtering deliberately is NOT. A default filter of
+    # Drafts would hide every published post and make ordinary editing begin by
+    # clearing a filter nobody set. Grouping separates drafts under their own
+    # heading while leaving everything reachable. These stay available, and off.
     view_filters:
-      - label: Drafts
-        field: draft
-        pattern: true
-      - label: Published
-        field: draft
-        pattern: false
+      filters:
+        - name: drafts
+          label: Drafts
+          field: draft
+          pattern: true
+        - name: published
+          label: Published
+          field: draft
+          pattern: false
     # content/ also holds About, Gallery, Archive, Stories and Replies. Only
     # things marked as a post belong in this collection.
     filter:
       field: type
       value: post
     fields:
+      # THIS IS THE PUBLISH CONTROL, AND IT IS FIRST ON PURPOSE. Do not move it
+      # back down. Fields render in the order they are declared here, and this
+      # one used to sit third, under Title. On a phone that put the single most
+      # consequential control below the fold at the moment you open a post to
+      # write in it.
+      #
+      # On 2026-08-02 a finished post with seven photographs was written, saved
+      # and committed cleanly without this switch ever coming into view. It
+      # stayed off the site for three days and nothing anywhere said so. The
+      # full reconstruction is in
+      # docs/superpowers/specs/2026-08-05-draft-watch-design.md.
+      #
+      # Sveltia has ONE button, Save, and no editorial workflow: version 0.176.0
+      # rejects publish_mode: editorial_workflow outright with
+      # "Editorial workflow is not yet supported". So there is no way to give
+      # the toolbar a separate "Save draft" and "Post". This switch is that
+      # choice, moved into the form where it can be defaulted to safe.
+      #
+      # THE LABEL STATES THE CURRENT CONDITION, NOT AN INTENTION. It used to
+      # read "Draft, keep this to myself", which describes what you meant.
+      # "NOT LIVE" describes what is true right now, which is the thing that
+      # went unnoticed.
+      #
+      # THE DEFAULT STAYS ON. Save on a new post writes a draft and nothing
+      # else happens. That is not the bug and must not be "fixed": the door
+      # stays locked, the key is simply at eye level now, with a bell on it.
+      - name: draft
+        label: NOT LIVE. Turn off to publish.
+        widget: boolean
+        required: false
+        default: true
+        hint: ON is Save Draft. It is committed and safe, but off the site and off every network. Turn OFF and Save when it should go live. Anything left ON gets a GitHub issue opened against it by .github/workflows/draft-watch.yml, which closes itself the moment you publish.
       - name: title
         label: Title
         widget: string
         required: false
         hint: "Leave empty and it is a Micro post: short, usually a photograph. Give it a title and it becomes a Post. Past 300 words a Post is also featured on the front page."
-      # THE TWO SWITCHES BELOW ARE THE PUBLISH CONTROLS. Read this before
-      # changing either default.
-      #
-      # Sveltia has ONE button, Save, and no editorial workflow: version 0.176.0
-      # rejects publish_mode: editorial_workflow outright with
-      # "Editorial workflow is not yet supported". So there is no way to give
-      # the toolbar a separate "Save draft" and "Post". These two switches are
-      # that choice, moved into the form where it can be defaulted to safe.
-      #
-      # Both default to the quiet setting. Save on a new post writes a draft and
-      # nothing else happens. Publishing, and cross-posting, are things that
-      # have to be deliberately switched on.
-      - name: draft
-        label: Draft — keep this to myself
-        widget: boolean
-        required: false
-        default: true
-        hint: ON is Save Draft. It is committed and safe, but off the site and off every network. Turn OFF and Save when it should go live.
       # Publishing to the site and broadcasting to a dozen networks are separate
       # decisions and are separated here. layouts/index.json builds /feed.json
       # from this field only, and /feed.json is what Micro.blog relays to
