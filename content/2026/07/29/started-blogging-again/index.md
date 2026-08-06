@@ -14,8 +14,6 @@ For most of my adult life, my work and personal life have naturally overlapped. 
 
 Years ago, I bought my first professional camera (I had one as I kid I didn't buy) and decided to travel the world, capturing the people, places, and moments I encountered. I shared my photos on my personal Instagram before eventually creating a dedicated travel page. Over time, though, I realized I had become more focused on creating content for the internet than truly experiencing the places I visited.
 
-![](/uploads/2026/IMG_9212.jpg "My first canon EOS 750D")
-
 ## The Turning Point; Winter Vacation 2017
 
 One of the perks of living in China is that when winter arrives, it's easy to take a short, affordable trip to the warm tropical countries of Southeast Asia.
@@ -48,8 +46,6 @@ Looking back, it seems obvious. At the time, it completely changed how I approac
 
 More importantly, it changed how I thought about social media.
 
-![](/uploads/2026/IMG_1034.jpeg "Steve and I Kayaking in a Cave in Phuket")
-
 ## Instagram Isn't Reality
 
 Back then, the only thing I consistently posted on Instagram Stories was my morning and evening walks with Nani, my first dog.
@@ -62,8 +58,6 @@ That morning I had taken Nani for a walk before heading out to meet my Chinese f
 
 The only thing I shared publicly was the walk with my dog and other cool pictures.
 
-![](/uploads/2026/8FCC3FE5-4D6F-4F1A-933E-6516379DD7EC_1_105_c.jpeg "Nani and I on our morning Walk.")
-
 How could someone who lived over 7000+ miles away believe they knew how I lived simply because of a few Instagram Stories?
 
 I almost got upset before realizing something.
@@ -75,8 +69,6 @@ He was judging the tiny fraction of it that I chose to show.
 I laughed, sent him a voice note explaining how my day had actually gone, and we both had a good laugh about it.
 
 Living in China made posting to Instagram even less important to me. Every time I wanted to update Instagram, I first had to turn on multiple VPNs to figure out which one actually worked. Most of the time they worked better over Wi-Fi than cellular data anyway.
-
-![](/uploads/2026/DADF71C0-1B7F-40C0-8E1F-E5A8473E3226_1_201_a-thumb.jpeg "1/3 of my VPN Stash")
 
 Social media simply wasn't worth that much effort.
 
@@ -122,8 +114,6 @@ I told my parents about it afterward. My mom, understandably, was worried. My si
 
 As COVID continued, so did my wandering. I spent my days at an Uncles' beach house, watching sunrises with the dogs, reading, thinking, and trying to make sense of what the world had become.
 
-![](/uploads/2026/IMG_1572.jpeg "Rambo, Cooper and Oklahoma")
-
 Ironically, every photo I shared on Instagram only fueled more assumptions. I was purposely adding fuel to the fire.
 
 I finally got admitted to Illinois Institute, I was probably the happiest person in the world. Thank goodness Illinois Tech didn't admit me based on my Instagram posts. They looked at my application, transcripts, and degree certificate instead. However as the lockdown and embassy backlog issues compounded I had to defer my admission for a year and ended up traveling to another country just for my visa. 
@@ -155,8 +145,6 @@ It was my graduation.
 I captioned it simply:
 
 **HOUDINI.**
-
-![](/uploads/2026/IMG_2290.jpeg "My only instagram post from 22 until now.")
 
 Like the famous illusionist, I had disappeared, only to reappear years later holding a STEM master's degree.
 
