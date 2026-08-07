@@ -5,7 +5,12 @@
     <!-- Page Meta -->
     <title>
       {{ block "title" . }}
-      {{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Site.Title }} - {{ .Title }}{{ end }}
+      {{/* An untitled post is normal here, not an accident: length decides
+           Posts versus Micro, so a piece of writing can have no title at all.
+           Without the second test this rendered the browser tab as "M I N T -"
+           with a separator hanging off the end of it. The og:title below
+           already handled this; the tab did not. */}}
+      {{ if or .IsHome (not .Title) }}{{ .Site.Title }}{{ else }}{{ .Site.Title }} - {{ .Title }}{{ end }}
       {{ end }}
 	</title>
 

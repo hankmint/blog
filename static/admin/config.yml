@@ -109,43 +109,49 @@ collections:
       field: type
       value: post
     fields:
-      # THIS IS THE PUBLISH CONTROL, AND IT IS FIRST ON PURPOSE. Do not move it
-      # back down. Fields render in the order they are declared here, and this
-      # one used to sit third, under Title. On a phone that put the single most
-      # consequential control below the fold at the moment you open a post to
-      # write in it.
+      # SAVE MEANS POST. THIS DEFAULTS TO OFF AND MUST STAY THAT WAY.
       #
-      # On 2026-08-02 a finished post with seven photographs was written, saved
-      # and committed cleanly without this switch ever coming into view. It
-      # stayed off the site for three days and nothing anywhere said so. The
-      # full reconstruction is in
-      # docs/superpowers/specs/2026-08-05-draft-watch-design.md.
+      # Sveltia has ONE button, Save, and no editorial workflow. Version
+      # 0.181.1, the newest release as of 2026-08-07, still rejects
+      # publish_mode: editorial_workflow with "Editorial workflow is not yet
+      # supported", and its workflow page is an empty shell of three headings
+      # with nothing behind them. There is no separate Publish button coming,
+      # so Save has to be the publish button.
       #
-      # Sveltia has ONE button, Save, and no editorial workflow: version 0.176.0
-      # rejects publish_mode: editorial_workflow outright with
-      # "Editorial workflow is not yet supported". So there is no way to give
-      # the toolbar a separate "Save draft" and "Post". This switch is that
-      # choice, moved into the form where it can be defaulted to safe.
+      # It used to default to ON, on the reasoning that a locked door is safer.
+      # It is not. On 2026-08-02 a finished post with seven photographs was
+      # written, saved and committed cleanly, and stayed off the site for three
+      # days because this switch was never touched. Making it louder and moving
+      # it to the top was not enough: the ask is to write and press Save and be
+      # done, from a phone, without remembering a step.
       #
-      # THE LABEL STATES THE CURRENT CONDITION, NOT AN INTENTION. It used to
-      # read "Draft, keep this to myself", which describes what you meant.
-      # "NOT LIVE" describes what is true right now, which is the thing that
-      # went unnoticed.
+      # The cost of the two failures is not symmetrical. A finished post that
+      # is silently invisible costs days and is only found by accident. A
+      # half-written post that is briefly visible on a personal blog costs
+      # nothing and is undone by turning this on and saving again. Nothing is
+      # broadcast either way: `crosspost` below is a separate switch, still
+      # defaults to false, and IS irreversible. That one stays locked.
       #
-      # THE DEFAULT STAYS ON. Save on a new post writes a draft and nothing
-      # else happens. That is not the bug and must not be "fixed": the door
-      # stays locked, the key is simply at eye level now, with a bell on it.
+      # It is still declared first so that on a phone it is the thing you see,
+      # and .github/workflows/draft-watch.yml still opens an issue against
+      # anything left switched on. The bell stays. The door is simply unlocked.
       - name: draft
-        label: NOT LIVE. Turn off to publish.
+        label: Keep this a draft, do not publish
         widget: boolean
         required: false
-        default: true
-        hint: ON is Save Draft. It is committed and safe, but off the site and off every network. Turn OFF and Save when it should go live. Anything left ON gets a GitHub issue opened against it by .github/workflows/draft-watch.yml, which closes itself the moment you publish.
+        default: false
+        hint: Leave this OFF and Save puts the post on the site. Turn it ON only to save something you are not finished with. Anything left ON gets a GitHub issue opened against it by .github/workflows/draft-watch.yml, which closes itself the moment you publish.
+      # A TITLE DOES NOT DECIDE POSTS VERSUS MICRO. LENGTH DOES.
+      # layouts/partials/split-posts.html sorts on .WordCount against
+      # featuredMinWords (300), and says so in its own comment: a title is a
+      # label someone felt like adding and says nothing about whether a thing
+      # is a piece of writing. This hint used to claim the opposite, which was
+      # simply wrong, and reading it back was what caught it.
       - name: title
         label: Title
         widget: string
         required: false
-        hint: "Leave empty and it is a Micro post: short, usually a photograph. Give it a title and it becomes a Post. Past 300 words a Post is also featured on the front page."
+        hint: "Optional. Past 300 words a post lands in Posts and can be featured on the front page, under 300 it lands in Micro. Length decides that, not this field, so leaving it empty costs nothing."
       # Publishing to the site and broadcasting to a dozen networks are separate
       # decisions and are separated here. layouts/index.json builds /feed.json
       # from this field only, and /feed.json is what Micro.blog relays to

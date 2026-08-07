@@ -1,6 +1,12 @@
 {{ define "body_class" }}post-template{{ end }}
 {{ define "main" }}
-{{ $all := (where (where .Site.RegularPages "Type" "post") "Title" "!=" "").ByDate.Reverse }}
+{{/* Older and newer walk the Posts list, and it must be THE Posts list, the
+     one split-posts.html builds from word count. This used to filter on
+     Title != "", which quietly meant "untitled things are not real posts".
+     That is the same mistake the editor's own hint made: a 353 word post
+     written on a phone with no title had no neighbours and was skipped in
+     everyone else's chain. One definition of a Post, in one file. */}}
+{{ $all := (partial "split-posts.html" .).long }}
 {{ $older := false }}{{ $newer := false }}
 {{ range $i, $p := $all }}
   {{ if eq $p.Permalink $.Permalink }}
@@ -80,11 +86,15 @@
 
       {{ if or $older $newer }}
       <nav class="mint-prevnext" role="navigation">
+        {{/* An untitled neighbour has no headline to print, and printing
+             nothing left a "Next" with an empty label under it. Fall back to
+             the opening line, which is exactly what the index and the share
+             button already do for the same post. */}}
         {{ with $older }}
-        <a href="{{ .RelPermalink }}"><span class="lbl">Previous</span><span class="nxt">{{ .Title }}</span></a>
+        <a href="{{ .RelPermalink }}"><span class="lbl">Previous</span><span class="nxt">{{ .Title | default (.Plain | plainify | truncate 60) }}</span></a>
         {{ end }}
         {{ with $newer }}
-        <a class="next-col" href="{{ .RelPermalink }}"><span class="lbl">Next</span><span class="nxt">{{ .Title }}</span></a>
+        <a class="next-col" href="{{ .RelPermalink }}"><span class="lbl">Next</span><span class="nxt">{{ .Title | default (.Plain | plainify | truncate 60) }}</span></a>
         {{ end }}
       </nav>
       {{ end }}

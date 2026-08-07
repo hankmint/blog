@@ -2,7 +2,8 @@
 
 **Date:** 2026-08-05
 **Author:** Nana Kofi (Kay) with Claude
-**Status:** Approved design, ready for implementation planning
+**Status:** Implemented, then **partly reversed on 2026-08-07**. See the amendment at the end
+before trusting anything below about the default.
 **Relates to:** `2026-07-28-selfhost-migration-design.md`, which introduced the Sveltia editor and
 the `draft` switch this design is about.
 
@@ -169,3 +170,50 @@ fixture is invented.
   at publish time. It is not part of this design.
 - **The post contains four typos** (`Pueto Rican`, `Lewandoski`, `solder field`, and
   `stuck on the beach for a couple of weeks not had finally been moved`). Kay's words, Kay's call.
+
+---
+
+## Amendment, 2026-08-07: the default was wrong
+
+Two days after this shipped, Kay opened the same post, saw the switch, and it still had not gone
+live. His words: "i cant come here and fix things i need to complete all in my cms, i need a simple
+button for publish or post."
+
+**The design above treated visibility as the fix. It was not.** Moving the switch to the top of the
+form and relabelling it "NOT LIVE" made the state legible, and legible was still not enough, because
+the failure is not that he cannot see the switch. It is that publishing was a second, separate act
+after finishing the writing, and a second act performed on a phone at the end of a weekend is an act
+that does not happen.
+
+**What changed.** `draft` now defaults to **false**. Save publishes. The switch stays, first in the
+form, for the rare case of deliberately holding something back.
+
+**Why this is not simply reintroducing the risk.** The two failure modes do not cost the same:
+
+- A finished post silently invisible costs days, and is only ever found by accident.
+- A half-written post briefly visible on a personal blog costs nothing, and is undone by turning the
+  switch on and saving again.
+
+Nothing is broadcast either way. `crosspost` is a separate field, still defaults to `false`, and
+sending genuinely cannot be undone. **That switch stays locked. This one does not need to be.**
+
+`draft-watch.yml` and `find-drafts.py` are unchanged and still correct: anything left switched on
+still opens an issue. The bell stays on the door. The door is simply unlocked now.
+
+## Also fixed on 2026-08-07: the title lie, and what it had infected
+
+Kay's second correction was "no title shouldnt make it a microblog," and he was right.
+`split-posts.html` sorts on `.WordCount` against `featuredMinWords` (300) and says so in its own
+comment. **A title has never decided Posts versus Micro.** But the editor's own hint claimed it did,
+and that false belief had been copied into two other places, both of which broke on the untitled
+353-word post:
+
+| Place | What it did | Fixed to |
+|---|---|---|
+| `config.yml` title hint | Claimed an empty title makes it a Micro post | States that length decides |
+| `head.html` `<title>` | Rendered the browser tab as `M I N T -`, separator dangling | Falls back to the site title, matching `og:title`, which already did |
+| `post/single.html` older/newer | Filtered the chain on `Title != ""`, so an untitled post had no neighbours and was skipped in everyone else's | Walks `(partial "split-posts.html" .).long`, one definition of a Post |
+| `post/single.html` pager label | Printed an empty `<span class="nxt">` under "Next" | Falls back to the opening line, as the index and share button already do |
+
+**One definition of a Post, in one file.** Anything that needs to know what a Post is asks
+`split-posts.html`. Nothing else is allowed a private opinion about it.
