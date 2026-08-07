@@ -290,6 +290,40 @@ ENTRIES=$(grep -c 'class="mint-entry' public/index.html || true)
 
 if grep -qE '>0 (essays|posts)<' public/index.html; then fail "homepage reports zero posts"; else pass "homepage does not report zero posts"; fi
 
+# A lazy <img> with no width and no height has no intrinsic size until it
+# decodes, so it takes up zero height and whatever is behind it shows through.
+# In the gallery that is the tile's paper background: the tile collapses, the
+# counter and dots float over nothing, then the photograph lands and shoves the
+# masonry column down. Kay reported it as tiles "always flashing white".
+#
+# Markdown images get their size from render-image.html via img-dims.html. Raw
+# <img> tags written by the Micro.blog importer do not, because render hooks
+# never see raw HTML, and scripts/size-images.py fills those in. This asserts
+# the result regardless of which path an image came in through.
+SIZELESS=$(python3 - <<'PY'
+import glob, re
+bad = {}
+for path in glob.glob("public/**/*.html", recursive=True):
+    with open(path, encoding="utf-8", errors="replace") as handle:
+        html = handle.read()
+    for m in re.finditer(r"<img\b[^>]*>", html):
+        tag = m.group(0)
+        if "uploads" not in tag:
+            continue  # brand assets and the portrait are sized in CSS
+        if re.search(r"\bwidth=", tag) and re.search(r"\bheight=", tag):
+            continue
+        bad.setdefault(path, 0)
+        bad[path] += 1
+for path, n in sorted(bad.items()):
+    print(f"{path} ({n})")
+PY
+)
+if [ -z "$SIZELESS" ]; then
+  pass "every photograph declares its width and height, so nothing collapses while it loads"
+else
+  fail "photographs with no declared size (run scripts/size-images.py): $(echo "$SIZELESS" | tr '\n' ' ')"
+fi
+
 # A link with no text inside it. The markup is there, the anchor is there, and
 # there is nothing on the page to see or tap, which is indistinguishable from a
 # broken page to the person looking at it.

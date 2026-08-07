@@ -13,11 +13,21 @@
 
        With no title it renders a plain img and no empty caption. */ -}}
 {{- $alt := or .PlainText .Text -}}
+{{- /* Declare the space each photograph needs. Without width and height a
+       lazy <img> has no intrinsic size until it decodes, so it takes up no
+       height at all and the paper shows through where the picture will be.
+       Every photograph in a post did this, one collapse each, all the way
+       down. See layouts/partials/img-dims.html. */ -}}
+{{- $dim := partial "img-dims.html" (dict "src" .Destination) -}}
+{{- $size := "" -}}
+{{- if and $dim.w $dim.h -}}
+  {{- $size = printf ` width="%d" height="%d"` $dim.w $dim.h | safeHTMLAttr -}}
+{{- end -}}
 {{- if .Title -}}
 <figure>
-  <img src="{{ .Destination | safeURL }}" alt="{{ $alt }}" loading="lazy" />
+  <img src="{{ .Destination | safeURL }}" alt="{{ $alt }}"{{ $size }} loading="lazy" />
   <figcaption>{{ .Title }}</figcaption>
 </figure>
 {{- else -}}
-<img src="{{ .Destination | safeURL }}" alt="{{ $alt }}" loading="lazy" />
+<img src="{{ .Destination | safeURL }}" alt="{{ $alt }}"{{ $size }} loading="lazy" />
 {{- end -}}

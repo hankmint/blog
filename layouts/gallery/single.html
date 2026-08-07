@@ -48,10 +48,8 @@
 
   {{ if $sets }}
   <div class="mint-gallery">
-    {{ range $sets }}
-      {{/* Bind the set. Inside the inner range, $ is the page, not this set. */}}
-      {{ $set := . }}
-      {{ $n := len .imgs }}
+    {{ range $si, $set := $sets }}
+      {{ $n := len $set.imgs }}
       <figure class="mint-shot{{ if gt $n 1 }} mint-set{{ end }}"{{ if gt $n 1 }} data-count="{{ $n }}"{{ end }}>
         <div class="mint-slides">
           {{ range $i, $src := $set.imgs }}
@@ -77,12 +75,27 @@
             {{ if hasPrefix $src "/" }}
               {{ if not (fileExists (printf "static%s" $thumb)) }}{{ $thumb = $src }}{{ end }}
             {{ end }}
+            {{/* Reserve the tile's height before the photograph arrives.
+                 Without this the first slide, which is the one in normal flow
+                 holding the tile open, has no size until it decodes: the tile
+                 collapses to its paper background with the counter and dots
+                 floating over nothing, then snaps open and shoves the whole
+                 masonry column down. That collapse is the white flash. */}}
+            {{ $dim := partial "img-dims.html" (dict "src" $thumb) }}
+            {{/* Only the tiles that open on screen are eager, and only their
+                 first slide. Making every tile eager would pull the whole
+                 gallery down at once and undo the work that took this page
+                 from 72 MB to 2.9 MB. Everything below the fold stays lazy,
+                 where reserved space is enough on its own: the box is already
+                 the right size, so nothing collapses and nothing jumps. */}}
+            {{ $eager := and (eq $i 0) (lt $si 4) }}
             <img
               class="mint-slide{{ if eq $i 0 }} is-on{{ end }}"
               src="{{ $thumb }}"
               alt="{{ $set.cap }}"
-              loading="lazy"
-              decoding="async"
+              {{ if and $dim.w $dim.h }}width="{{ $dim.w }}" height="{{ $dim.h }}" {{ end }}
+              loading="{{ if $eager }}eager{{ else }}lazy{{ end }}"
+              {{ if $eager }}fetchpriority="high" {{ end }}decoding="async"
               data-full="{{ $src }}"
               data-cap="{{ $set.cap }}"
               data-href="{{ $set.url }}" />

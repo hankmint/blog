@@ -20,4 +20,4 @@ url: "/2025/12/21/best-of-the-grayscale-this.html"
 ---
 Best of grayscale this morning.
 
-<img src="/uploads/2025/54be84fc9e07489e9513c4350302c7a7.jpg"><img src="/uploads/2025/9cbb12e7a6a24069abeb69e50eb90107.jpg"><img src="/uploads/2025/9eaf03a7363d4b578fd82af2d17190e7.jpg">
+<img width="1600" height="1067" src="/uploads/2025/54be84fc9e07489e9513c4350302c7a7.jpg"><img width="1600" height="1067" src="/uploads/2025/9cbb12e7a6a24069abeb69e50eb90107.jpg"><img width="1600" height="1067" src="/uploads/2025/9eaf03a7363d4b578fd82af2d17190e7.jpg">

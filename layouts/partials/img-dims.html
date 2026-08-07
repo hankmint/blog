@@ -1,0 +1,38 @@
+{{/* The real pixel size of a photograph, so the page can reserve its space.
+
+     Every photograph on this site is loading="lazy" and declared no width or
+     height. An <img> with neither has no intrinsic size until it decodes, so
+     it occupies ZERO height, and the thing around it collapses to whatever is
+     behind it. In the gallery that is the tile's own paper background, which
+     is why Kay saw tiles "always flashing white": the tile had no height, the
+     counter and dots floated over nothing, then the photograph arrived and the
+     whole masonry column jumped. In a post it is the same collapse, once per
+     photograph, all the way down the page.
+
+     Declaring width and height gives the browser the aspect ratio before a
+     single byte of the image arrives. It reserves exactly the right box, the
+     photograph fades into a space that was already there, and nothing moves.
+
+     imageConfig reads the file at build time, so these are the true dimensions
+     and cannot drift from the file the way a hardcoded number would.
+
+     Returns {w, h}, both 0 when the size cannot be established, which callers
+     must treat as "declare nothing" rather than "declare zero". */}}
+{{- $src := .src -}}
+{{- $w := 0 -}}
+{{- $h := 0 -}}
+{{- if hasPrefix $src "/" -}}
+  {{/* Only formats imageConfig can actually decode. Handed anything else it
+       stops the build, and a photograph is not worth failing a deploy over. */}}
+  {{- $ext := lower (path.Ext $src) -}}
+  {{- if in (slice ".jpg" ".jpeg" ".png" ".gif" ".webp" ".tif" ".tiff" ".bmp") $ext -}}
+    {{- $path := printf "static%s" $src -}}
+    {{- if fileExists $path -}}
+      {{- with (imageConfig (printf "/%s" $path)) -}}
+        {{- $w = .Width -}}
+        {{- $h = .Height -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- return (dict "w" $w "h" $h) -}}

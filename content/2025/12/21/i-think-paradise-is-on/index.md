@@ -18,4 +18,4 @@ url: "/2025/12/21/i-think-paradise-is-on.html"
 ---
 I think paradise is on earth and I’ve experienced it in many places when immersed in nature. There’s beauty all around us.
 
-<img src="/uploads/2025/f36b4dc9a3b54472aaa7e066af9fc04a.jpg"><img src="/uploads/2025/bcf5b8ee0a624959aa6100d463731518.jpg">
+<img width="1200" height="1600" src="/uploads/2025/f36b4dc9a3b54472aaa7e066af9fc04a.jpg"><img width="1200" height="1600" src="/uploads/2025/bcf5b8ee0a624959aa6100d463731518.jpg">
