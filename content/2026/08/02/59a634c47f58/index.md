@@ -1,6 +1,6 @@
 ---
-title: ''
 draft: true
+title: ''
 crosspost: false
 date: 2026-08-02T10:20:00-05:00
 type: post
