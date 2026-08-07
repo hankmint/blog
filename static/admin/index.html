@@ -100,20 +100,25 @@
 
         function start() {
           enable(document);
-          new MutationObserver(function (records) {
-            for (var i = 0; i < records.length; i++) {
-              var added = records[i].addedNodes;
-              for (var j = 0; j < added.length; j++) {
-                var n = added[j];
-                if (n.nodeType !== 1) continue;
-                enable(n);
-                // The node itself may be the surface, not a container of one.
-                if (n.matches && n.matches(SURFACES) && !n.hasAttribute("spellcheck")) {
-                  n.setAttribute("spellcheck", "true");
-                  n.setAttribute("data-mint-spellcheck", "on");
-                }
-              }
-            }
+
+          // THIS MUST STAY CHEAP. The body is a Lexical editor: it rewrites
+          // its own DOM on every keystroke, so a naive observer that walked
+          // each added node would run four selectors per character typed, on a
+          // phone, while an upload is in flight. Doing the work per mutation
+          // was the first version of this and it was wrong.
+          //
+          // Instead: mutations only set a flag. One pass runs on the next
+          // animation frame, no matter how many mutations arrived, and the
+          // editor is left alone in between.
+          var queued = false;
+          function sweep() {
+            queued = false;
+            enable(document);
+          }
+          new MutationObserver(function () {
+            if (queued) return;
+            queued = true;
+            (window.requestAnimationFrame || window.setTimeout)(sweep, 0);
           }).observe(document.documentElement, { childList: true, subtree: true });
         }
 
