@@ -7,10 +7,12 @@
       {{ block "title" . }}
       {{/* An untitled post is normal here, not an accident: length decides
            Posts versus Micro, so a piece of writing can have no title at all.
-           Without the second test this rendered the browser tab as "M I N T -"
-           with a separator hanging off the end of it. The og:title below
-           already handled this; the tab did not. */}}
-      {{ if or .IsHome (not .Title) }}{{ .Site.Title }}{{ else }}{{ .Site.Title }} - {{ .Title }}{{ end }}
+           This used to print .Title raw and rendered the tab as "M I N T -"
+           with a separator hanging off the end. It now asks display-title.html
+           for the same headline every list on the site shows, so a tab, a
+           search result and the index all say the same thing. */}}
+      {{ $dt := cond .IsPage (partial "display-title.html" (dict "page" . "max" 70)) .Title }}
+      {{ if or .IsHome (not $dt) }}{{ .Site.Title }}{{ else }}{{ .Site.Title }} - {{ $dt }}{{ end }}
       {{ end }}
 	</title>
 
@@ -29,8 +31,11 @@
     {{- $sum := replaceRE `(?s)<a class="embed-fallback".*?</a>` "" .Summary -}}
     {{- $desc := .Description | default $sum | plainify | strings.TrimSpace | truncate 180 -}}
     {{- if not $desc }}{{ $desc = .Site.Params.description }}{{ end -}}
-    {{- $title := cond .IsHome .Site.Title (printf "%s - %s" .Title .Site.Title) -}}
-    {{- if and (not .IsHome) (not .Title) }}{{ $title = .Site.Title }}{{ end -}}
+    {{/* Same headline as the tab and every list, so a shared link is not
+         called one thing on the site and another on Bluesky. */}}
+    {{- $dtitle := cond .IsPage (partial "display-title.html" (dict "page" . "max" 90)) .Title -}}
+    {{- $title := cond .IsHome .Site.Title (printf "%s - %s" $dtitle .Site.Title) -}}
+    {{- if and (not .IsHome) (not $dtitle) }}{{ $title = .Site.Title }}{{ end -}}
     {{/* Which photograph gets shared, in order:
            1. share_image, chosen deliberately in the editor
            2. images:, which the Micro.blog import wrote

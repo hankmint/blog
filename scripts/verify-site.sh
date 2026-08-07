@@ -290,6 +290,40 @@ ENTRIES=$(grep -c 'class="mint-entry' public/index.html || true)
 
 if grep -qE '>0 (essays|posts)<' public/index.html; then fail "homepage reports zero posts"; else pass "homepage does not report zero posts"; fi
 
+# A link with no text inside it. The markup is there, the anchor is there, and
+# there is nothing on the page to see or tap, which is indistinguishable from a
+# broken page to the person looking at it.
+#
+# This is what the featured block did to the untitled post of 2026-08-02: it
+# printed .Title straight into the anchor, and .Title was empty, so the home
+# page offered a headline that was not there. Kay found it, not this harness.
+# Every headline now comes from display-title.html, and this makes sure of it.
+EMPTY_LINKS=$(python3 - <<'PY'
+import glob, re
+bad = []
+for path in glob.glob("public/**/*.html", recursive=True):
+    with open(path, encoding="utf-8", errors="replace") as handle:
+        html = handle.read()
+    # Anchors that carry a headline: the featured block, the year index, and
+    # the previous/next pager. An icon-only anchor is deliberate and excluded.
+    for m in re.finditer(r'<a\b[^>]*>(.*?)</a>', html, re.S):
+        inner = m.group(1)
+        if re.search(r'<(svg|img)\b', inner):
+            continue
+        if re.sub(r'<[^>]+>', '', inner).strip():
+            continue
+        bad.append(path)
+        break
+for path in sorted(set(bad)):
+    print(path)
+PY
+)
+if [ -z "$EMPTY_LINKS" ]; then
+  pass "no link is rendered with nothing inside it to click"
+else
+  fail "links with no text to click, in: $(echo "$EMPTY_LINKS" | tr '\n' ' ')"
+fi
+
 # The gallery only renders for a page with type: gallery. Nothing declared it,
 # so the gallery and its lightbox did not exist at all.
 [ -f public/photos/index.html ]; check $? "the gallery page is generated at /photos/"

@@ -54,7 +54,7 @@
 
            Where the browser has a real share sheet, the button opens that
            instead, which reaches every app the reader actually uses. */}}
-      {{ $share := .Title | default (.Plain | truncate 110) }}
+      {{ $share := partial "display-title.html" (dict "page" . "max" 110) }}
       <section class="mint-share" aria-label="Share this post">
         <button type="button" class="mint-share-btn" aria-expanded="false"
                 aria-label="Share this post" title="Share"
@@ -91,10 +91,10 @@
              the opening line, which is exactly what the index and the share
              button already do for the same post. */}}
         {{ with $older }}
-        <a href="{{ .RelPermalink }}"><span class="lbl">Previous</span><span class="nxt">{{ .Title | default (.Plain | plainify | truncate 60) }}</span></a>
+        <a href="{{ .RelPermalink }}"><span class="lbl">Previous</span><span class="nxt">{{ partial "display-title.html" (dict "page" . "max" 60) }}</span></a>
         {{ end }}
         {{ with $newer }}
-        <a class="next-col" href="{{ .RelPermalink }}"><span class="lbl">Next</span><span class="nxt">{{ .Title | default (.Plain | plainify | truncate 60) }}</span></a>
+        <a class="next-col" href="{{ .RelPermalink }}"><span class="lbl">Next</span><span class="nxt">{{ partial "display-title.html" (dict "page" . "max" 60) }}</span></a>
         {{ end }}
       </nav>
       {{ end }}

@@ -1,0 +1,41 @@
+{{/* The headline to show for a post, whether or not it has a title.
+
+     ONE DEFINITION, USED EVERYWHERE. On 2026-08-07 an untitled 353 word post
+     went live and the home page rendered its featured link as
+     <h2><a href="..."></a></h2>: the link was there, with nothing inside it.
+     Nothing to see, nothing to tap. Meanwhile the index truncated at 90
+     characters, the pager at 60, and the share button at 110, so the same post
+     was called four different things in four places and one of them was
+     nothing at all.
+
+     A title is optional here on purpose: length decides Posts versus Micro,
+     not a title (see split-posts.html). So every place that prints a headline
+     has to cope with not having one, and they should all cope identically.
+
+     Kay's rule, in his words: the first few words of every blog should be the
+     title. So take the opening sentence, which is where a person's own
+     headline usually already is, and fall back to a character truncation if
+     that sentence runs long.
+
+     Call it with the page, and optionally a maximum length:
+
+       {{ partial "display-title.html" (dict "page" .) }}
+       {{ partial "display-title.html" (dict "page" . "max" 60) }} */}}
+{{- $p := .page -}}
+{{- $max := int (.max | default 90) -}}
+{{- $t := $p.Title -}}
+{{- if not $t -}}
+  {{- $plain := $p.Plain | plainify | htmlUnescape | strings.TrimSpace -}}
+  {{- if $plain -}}
+    {{/* The opening sentence. Anything before the first full stop, which for
+         "This weekend has been an eventful one." is exactly the headline the
+         writer already wrote without noticing. */}}
+    {{- $first := strings.TrimSpace (index (split $plain ".") 0) -}}
+    {{- if and $first (le (len $first) $max) -}}
+      {{- $t = printf "%s." $first -}}
+    {{- else -}}
+      {{- $t = truncate $max $plain -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- return $t -}}

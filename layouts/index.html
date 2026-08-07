@@ -25,8 +25,16 @@
     <div class="mint-featured">
       {{ range . }}
         <article class="feat h-entry">
-          <h2 class="p-name"><a class="u-url" href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
-          {{ with .Summary }}<p class="stand p-summary">{{ . | plainify | truncate 190 }}</p>{{ end }}
+          {{/* This link used to print .Title and nothing else. On an untitled
+               post that produced <a href="..."></a>, an empty link: present in
+               the markup, invisible on the page, impossible to tap. The
+               standfirst underneath was never a link either, so the whole
+               featured block had nothing clickable in it. */}}
+          <h2 class="p-name"><a class="u-url" href="{{ .RelPermalink }}">{{ partial "display-title.html" (dict "page" .) }}</a></h2>
+          {{/* The standfirst is skipped when the headline was taken FROM the
+               opening line, because it would repeat the sentence directly
+               above it word for word. */}}
+          {{ if .Title }}{{ with .Summary }}<p class="stand p-summary">{{ . | plainify | truncate 190 }}</p>{{ end }}{{ end }}
           <div class="post-meta">
             {{ with .Params.categories }}<span class="dot"></span><span>{{ index . 0 }}</span><span>&middot;</span>{{ end }}
             <time class="dt-published" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format (.Site.Params.dateFormatToUse | default "January 02, 2006") }}</time>

@@ -11,7 +11,7 @@
   {{ end }}
   <li><a class="mint-entry h-entry" href="{{ .RelPermalink }}">
     <span class="date">{{ .Date.Format "Jan 02" }}</span>
-    <span class="ttl p-name">{{ with .Title }}{{ . }}{{ else }}{{ .Plain | plainify | truncate 90 }}{{ end }}</span>
+    <span class="ttl p-name">{{ partial "display-title.html" (dict "page" .) }}</span>
     <span class="topic">{{ with .Params.categories }}<span class="dot"></span>{{ index . 0 }}{{ end }}</span>
   </a></li>
 {{ end }}
