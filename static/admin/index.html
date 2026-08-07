@@ -50,6 +50,81 @@
       })();
     </script>
 
+    <!-- Turn the red squiggle on where Kay writes.
+         =====================================================================
+         Four typos went live in the 2026-08-02 post and the editor said
+         nothing. Checked against the vendored bundle: Sveltia sets
+         spellcheck="false" in seven places, and NOT ONE of them is the writing
+         surface. They are code blocks, the number spinner, the access token
+         box and the API key boxes, all correct. The Lexical root is created
+         with role, class and contenteditable and NO spellcheck attribute at
+         all, so it inherits whatever the browser feels like, which is not
+         something to leave to chance on a phone.
+
+         So: set it explicitly, and only where writing happens.
+
+         THE ONE RULE THIS MUST NEVER BREAK: if an element already declares
+         spellcheck, LEAVE IT ALONE. That attribute is Sveltia saying "not
+         here", and it is right every time it says it. This only fills in the
+         silence, it never overrules.
+
+         MutationObserver rather than a single pass because the editor is a
+         single page app: the fields for a post do not exist until you open it,
+         and they are torn down and rebuilt when you open the next one. -->
+    <script>
+      (function () {
+        // Where writing happens. [role="textbox"] and .lexical-root are the
+        // markdown body; textarea is the same field in raw markdown mode,
+        // which the m-arrow button at the top right switches to. Plain inputs
+        // are only touched inside .field-wrapper, which is a post's own field,
+        // so the sign-in and search boxes elsewhere are never candidates.
+        var SURFACES = '[role="textbox"], .lexical-root, textarea, .field-wrapper input';
+
+        function enable(root) {
+          var nodes;
+          try {
+            nodes = root.querySelectorAll(SURFACES);
+          } catch (e) {
+            return;
+          }
+          for (var i = 0; i < nodes.length; i++) {
+            var el = nodes[i];
+            // Sveltia's own "false" wins. Always.
+            if (el.hasAttribute("spellcheck")) continue;
+            // A checkbox has nothing to spell.
+            if (el.tagName === "INPUT" && !/^(text|search|)$/i.test(el.type)) continue;
+            el.setAttribute("spellcheck", "true");
+            el.setAttribute("data-mint-spellcheck", "on");
+          }
+        }
+
+        function start() {
+          enable(document);
+          new MutationObserver(function (records) {
+            for (var i = 0; i < records.length; i++) {
+              var added = records[i].addedNodes;
+              for (var j = 0; j < added.length; j++) {
+                var n = added[j];
+                if (n.nodeType !== 1) continue;
+                enable(n);
+                // The node itself may be the surface, not a container of one.
+                if (n.matches && n.matches(SURFACES) && !n.hasAttribute("spellcheck")) {
+                  n.setAttribute("spellcheck", "true");
+                  n.setAttribute("data-mint-spellcheck", "on");
+                }
+              }
+            }
+          }).observe(document.documentElement, { childList: true, subtree: true });
+        }
+
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", start);
+        } else {
+          start();
+        }
+      })();
+    </script>
+
     <!-- Sveltia CMS, vendored rather than loaded from a CDN so the editor works
          offline and the version is pinned with the repo. See static/admin/VERSION. -->
     <script src="/admin/sveltia-cms.js"></script>
